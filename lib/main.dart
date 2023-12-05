@@ -1,8 +1,27 @@
+import 'package:camera/camera.dart';
 import 'package:cgg_attendance/routes/app_pages.dart';
 import 'package:cgg_attendance/routes/app_routes.dart';
+import 'package:cgg_attendance/takePicture.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+    final cameras = await availableCameras();
+
+  // Get a specific camera from the list of available cameras.
+  final firstCamera = cameras.last;
+
+
+  // Obtain a list of the available cameras on the device.
+// runApp(
+//     MaterialApp(
+//       theme: ThemeData.dark(),
+//       home: TakePictureScreen(
+//         // Pass the appropriate camera to the TakePictureScreen widget.
+//         camera: firstCamera,
+//       ),
+//     ),
+//   );
   runApp(const MyApp());
 }
 
@@ -13,6 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
        initialRoute: AppRoutes.initial,
         routes: AppPages.routes,
       title: 'Flutter Demo',

@@ -1,5 +1,7 @@
+import 'package:camera/camera.dart';
 import 'package:cgg_attendance/attendance.dart';
 import 'package:cgg_attendance/routes/app_routes.dart';
+import 'package:cgg_attendance/takePicture.dart';
 import 'package:cgg_attendance/user_registration.dart';
 import 'package:flutter/material.dart';
 
