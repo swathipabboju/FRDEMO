@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cgg_attendance/const/colors.dart';
+import 'package:cgg_attendance/const/image_constants.dart';
 import 'package:cgg_attendance/routes/app_routes.dart';
 import 'package:cgg_attendance/takePicture.dart';
-import 'package:cgg_attendance/takepicture_ios.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,39 +24,63 @@ class _UserRegistrationState extends State<UserRegistration> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Registration"),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              TextButton(
-                  onPressed: () {
-                    if (firstCamera != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TakePictureScreenIOS(
-                            camera: firstCamera!,
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text("Register")),
-              TextButton(
-                  onPressed: () {
-                    if (savedProfilePath != "") {
-                      deleteImage(context);
-
-                      setState(() {
-                        savedProfilePath = "";
-                      });
-                    }
-                  },
-                  child: const Text("Delete User"))
-            ],
+        
+        body: Stack(
+          
+           children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage(ImageConstants.bg ), fit: BoxFit.fill),
           ),
+        ),
+      
+            
+            Center(
+              child: Container(
+                width: 300,
+                height: 400,
+            
+                color: Colors.white,
+                child: Column(
+            
+                  children: [
+                    
+                    Text("User Registration",style: TextStyle(fontSize: 21,color: Colors.black),),
+                    SizedBox(width: 20, height: 20,),
+                    Image.asset(ImageConstants.logo,width: 100, height: 100,),
+              
+                    SizedBox(width: 20, height: 20,),
+                    TextButton(
+                       style: ButtonStyle(
+    backgroundColor: MaterialStateProperty.all<Color>(AppColors.primaryDark),
+    shape: MaterialStateProperty.all<OutlinedBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0), // Adjust the borderRadius as needed
+      ),
+    ),
+  ),
+
+
+                        onPressed: () {
+                          if (firstCamera != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TakePictureScreen(
+                                  camera: firstCamera!,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text("REGISTER",style: TextStyle(color: Colors.white),))
+                  ],
+                ),
+              ),
+            ),
+          ],
+
         ));
   }
 
