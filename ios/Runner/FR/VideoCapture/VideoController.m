@@ -42,38 +42,38 @@
     _type = 1;
     self.isAlertPresented = NO;
     self.loadImage;
-//    NSLog(@"Image path IOS: %@", _filePath);
-
+    //    NSLog(@"Image path IOS: %@", _filePath);
+    
     
     //    NSString *imageURLString = _profileUrl;
-//    NSLog(@"_registredProfilePhoto: %@",_registredProfilePhoto);
-//    NSString *imageURLString = @"https://virtuo.cgg.gov.in/EmployeeProfileIcon/1970employeeimage20231009142548_044.png";
-//    NSURL *imageURL = [NSURL URLWithString:imageURLString];
-//    
-//    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-//        if (error) {
-//            NSLog(@"Error fetching image: %@", error);
-//            return;
-//        }
-//        
-//        if (data) {
-//            UIImage *image = [UIImage imageWithData:data];
-//            if (image) {
-//                // Use the image
-//                image = [self fixImageOrientation:image];
-//                _registredProfilePhoto = image;
-//                
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    // Update UI with the image (if needed)
-//                });
-//            } else {
-//                NSLog(@"Failed to convert data to image");
-//            }
-//        } else {
-//            NSLog(@"No image data received");
-//        }
-//    }];
-  //  [task resume];
+    //    NSLog(@"_registredProfilePhoto: %@",_registredProfilePhoto);
+    //    NSString *imageURLString = @"https://virtuo.cgg.gov.in/EmployeeProfileIcon/1970employeeimage20231009142548_044.png";
+    //    NSURL *imageURL = [NSURL URLWithString:imageURLString];
+    //
+    //    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    //        if (error) {
+    //            NSLog(@"Error fetching image: %@", error);
+    //            return;
+    //        }
+    //
+    //        if (data) {
+    //            UIImage *image = [UIImage imageWithData:data];
+    //            if (image) {
+    //                // Use the image
+    //                image = [self fixImageOrientation:image];
+    //                _registredProfilePhoto = image;
+    //
+    //                dispatch_async(dispatch_get_main_queue(), ^{
+    //                    // Update UI with the image (if needed)
+    //                });
+    //            } else {
+    //                NSLog(@"Failed to convert data to image");
+    //            }
+    //        } else {
+    //            NSLog(@"No image data received");
+    //        }
+    //    }];
+    //  [task resume];
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
     _activityIndicator.center = self.view.center;
     _activityIndicator.color = [UIColor whiteColor];
@@ -147,32 +147,37 @@
         // Get the application documents directory
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
-
+        
         // Create a file path for the saved image
         NSString *imageName = @"profile.jpg"; // Replace with the actual image name
         NSString *imagePath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"images/%@", imageName]];
-
+        
         // Check if the image file exists
         NSFileManager *fileManager = [NSFileManager defaultManager];
+        
         if ([fileManager fileExistsAtPath:imagePath]) {
             // Load the image data
+            // Load the image data
             NSData *imageData = [NSData dataWithContentsOfFile:imagePath];
-            _profileImageData = imageData;
-             
-            // Use the 'imageData' as needed
-            // Example: Create a UIImage from the data
-            UIImage *loadedImage = [UIImage imageWithData:imageData];
+            
+            // Convert the image data to a UIImage
+            UIImage *originalImage = [UIImage imageWithData:imageData];
+            
+            // Determine the correct orientation and create a new UIImage
+            UIImage *fixedImage = [self fixImageOrientation:originalImage];
+            NSLog(@"_registredProfilePhoto: %@",fixedImage);
+            // Convert the fixed image data to a Base64-encoded string
+            NSData *fixedImageData = UIImageJPEGRepresentation(fixedImage, 1.0);
+            _profileImageData = fixedImageData;
+            
+            NSString *base64String = [fixedImageData base64EncodedStringWithOptions:0];
+            
+            // Print the Base64-encoded string
+          //  NSLog(@"Image Data: %@", base64String);
             
             // Perform actions with the loaded image
-            // Convert the image data to a Base64-encoded string
-                        NSString *base64String = [imageData base64EncodedStringWithOptions:0];
-
-                        // Print the Base64-encoded string
-                        NSLog(@"Image Data: %@", base64String);
-                        
-                        // Perform actions with the loaded image
-                        NSLog(@"Image loaded successfully");
-
+            NSLog(@"Image loaded successfully");
+            
         } else {
             NSLog(@"Image not found");
         }
@@ -239,7 +244,7 @@
     //crop live image
     UIImage *cropImage = [Tools cropImage:image toRect:box.transform2Rect];
     _finalImage = cropImage;
-
+    
     //  NSLog(@"_finalImage: %@", _finalImage);
     //  NSLog(@"_registredProfilePhoto: %@", _registredProfilePhoto);
     self.time++;
@@ -266,7 +271,7 @@
     compare = [self.mfn compare:self.inputImage with:cropImage];
     NSLog(@"compare",compare);
     if (type == 1){
-       // NSLog(@"_registredProfilePhoto: %@",_registredProfilePhoto);
+        // NSLog(@"_registredProfilePhoto: %@",_registredProfilePhoto);
         [self sendFormDataWithImages:_finalImage image2 :_registredProfilePhoto ];
     }
 }
@@ -294,7 +299,7 @@
                     // Handle OK action here
                     NSLog(@"OK button tapped");
                     // Call the result handler with the data
-                   
+                    
                     if (self.PunchInresultHandler) {
                         self->_resultData= @{
                             @"result": @"No face Detected",
@@ -322,8 +327,8 @@
                         [self.session stopRunning];
                         [self dismissViewControllerAnimated:YES completion:nil];
                     }
-//                    [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"No face detected"image:nil];
-                   
+                    //                    [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"No face detected"image:nil];
+                    
                 }];
                 [alertController addAction:okAction];
                 [self presentViewController:alertController animated:YES completion:nil];
@@ -358,8 +363,8 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [_activityIndicator startAnimating];
         });
-     //   NSString *urlString=@"https://frapp1.cgg.gov.in/api/v1/verification/verify";
-    //    NSString *urlString=@"https://faceapp.cgg.gov.in/api/v1/verification/verify";
+        //   NSString *urlString=@"https://frapp1.cgg.gov.in/api/v1/verification/verify";
+        //    NSString *urlString=@"https://faceapp.cgg.gov.in/api/v1/verification/verify";
         
         NSString *urlString=@"https://facialrecognition.cgg.gov.in/Face/Facematch";
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init] ;
@@ -388,18 +393,18 @@
         [body appendData:[NSData dataWithData:imageData]];
         [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
         
-
+        
         
         // Replace this path with the actual path to your file
-         //   NSString *filePath = @"/var/mobile/Containers/Data/Application/6613C022-0454-4A8B-9C9D-F3ECFA60D955/Documents/profile.jpg";
+        //   NSString *filePath = @"/var/mobile/Containers/Data/Application/6613C022-0454-4A8B-9C9D-F3ECFA60D955/Documents/profile.jpg";
         
-       
+        
         if (_profileImageData) {
             // Image data is available, you can use it as needed
             NSLog(@"Success to read image data from file: %@");
             UIImage *image = [UIImage imageWithData:_profileImageData];
             // Now 'image' contains the UIImage representation of the image file
-          //  NSData *imageData1 = UIImageJPEGRepresentation(regImg, 0);
+            //  NSData *imageData1 = UIImageJPEGRepresentation(regImg, 0);
             [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
             [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"target_image\"; filename=\"%@.jpg\"\r\n",str_image1] dataUsingEncoding:NSUTF8StringEncoding]];
             [body appendData:[@"Content-Type: application/octet-stream\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
@@ -409,21 +414,21 @@
             // Failed to read image data from the file path
             NSLog(@"Failed to read image data from file: %@", _profileImageData);
         }
-//        NSData *imageData1 = UIImageJPEGRepresentation(regImg, 0);
-//        [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-//        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"target_image\"; filename=\"%@.jpg\"\r\n",str_image1] dataUsingEncoding:NSUTF8StringEncoding]];
-//        [body appendData:[@"Content-Type: application/octet-stream\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-//        [body appendData:[NSData dataWithData:imageData1]];
-//        [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        //        NSData *imageData1 = UIImageJPEGRepresentation(regImg, 0);
+        //        [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        //        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"target_image\"; filename=\"%@.jpg\"\r\n",str_image1] dataUsingEncoding:NSUTF8StringEncoding]];
+        //        [body appendData:[@"Content-Type: application/octet-stream\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        //        [body appendData:[NSData dataWithData:imageData1]];
+        //        [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
         
         
         NSDictionary *headers = @{
             @"x-api-key": @"7e37e740-ab21-47c1-8431-b1b69ac21d25", // Replace with your actual access token
         };
-//        NSDictionary *headers = @{
-//            @"x-api-key": @"c359dd17-0389-4704-8365-3845a9012bed", // Replace with your actual access token
-//        };
-//
+        //        NSDictionary *headers = @{
+        //            @"x-api-key": @"c359dd17-0389-4704-8365-3845a9012bed", // Replace with your actual access token
+        //        };
+        //
         
         for (NSString *key in headers.allKeys) {
             [request setValue:headers[key] forHTTPHeaderField:key];
@@ -435,7 +440,7 @@
         //return and test
         NSData *returnData = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
         NSString *returnString = [[NSString alloc] initWithData:returnData encoding:NSUTF8StringEncoding];
-          NSLog(@"%@1234", returnString);
+        NSLog(@"%@1234", returnString);
         [self.session stopRunning];
         // Stop the activity indicator when the API call is complete
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -446,7 +451,7 @@
         NSError *error = nil;
         NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:responseData options:kNilOptions error:&error];
         id result = responseDict[@"result"];
-
+        
         if ([responseDict isKindOfClass:[NSDictionary class]]) {
             NSDictionary *responseDict = (NSDictionary *)responseDict;
             // Check if the "result" field is null
@@ -458,7 +463,7 @@
                 NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
                 [userDefaults setObject:code forKey:@"reason"];
                 
-             //   NSLog(@" Code: %@", code);
+                //   NSLog(@" Code: %@", code);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Virtuo"
                                                                                              message:@"Server not responding, Please try again"
@@ -469,9 +474,9 @@
                                                                      handler:^(UIAlertAction * _Nonnull action) {
                         // Handle OK action here
                         // NSLog(@"OK button tapped");
-                      //  [self performOKAction]; // Call your custom method here
+                        //  [self performOKAction]; // Call your custom method here
                         [self dismissViewControllerAnimated:YES completion:^{
-//                            [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"face not matched"image:finalCroppedImage];
+                            //                            [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"face not matched"image:finalCroppedImage];
                         }];
                     }];
                     [alertController addAction:okAction];
@@ -479,7 +484,7 @@
                 });
             } else if ([result isKindOfClass:[NSArray class]]){
                 NSLog(@"resilttttttttt");
-               // NSArray *resultArray = responseDict[@"result"];
+                // NSArray *resultArray = responseDict[@"result"];
                 NSArray *resultArray = result;
                 if (resultArray.count > 0) {
                     NSDictionary *firstResult = resultArray[0];
@@ -510,7 +515,7 @@
                                             @"result": @"face Matched",
                                             @"status" : @"punchIn"
                                         };
-                                       
+                                        
                                         self.PunchInresultHandler(self.resultData);
                                         [self.session stopRunning];
                                         [self dismissViewControllerAnimated:YES completion:nil];
@@ -519,7 +524,7 @@
                                         _resultData= @{
                                             @"result": @"face Matched",
                                             @"status" : @"punchOut"
-
+                                            
                                         };
                                         self.PunchOutresultHandler(self.resultData);
                                         [self.session stopRunning];
@@ -529,7 +534,7 @@
                                         _resultData= @{
                                             @"result": @"face Matched",
                                             @"status" : @"forgotPunchOut"
-
+                                            
                                         };
                                         self.ForgotPunchOutresultHandler(self.resultData);
                                         [self.session stopRunning];
@@ -537,13 +542,13 @@
                                     }
                                     // Example: Accessing resultData
                                     NSLog(@"Result Data ios xcode: %@", self.resultData);
-//                                    if (self->_punchInCalled == true){
-//                                        [self.delegateIn didReceiveDataPunchIn:@"Data from Objective-C"image:finalCroppedImage];
-//                                    } else if (self->_punchOutCalled == true){
-//                                        [self.delegateOut didReceiveDataPunchOut:@"Data from Objective-C"image:finalCroppedImage];
-//                                    } else if  (self->_fotgotPunchOutCalled == true) {
-//                                        [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"forgot punchout true "image:finalCroppedImage];
-//                                    }
+                                    //                                    if (self->_punchInCalled == true){
+                                    //                                        [self.delegateIn didReceiveDataPunchIn:@"Data from Objective-C"image:finalCroppedImage];
+                                    //                                    } else if (self->_punchOutCalled == true){
+                                    //                                        [self.delegateOut didReceiveDataPunchOut:@"Data from Objective-C"image:finalCroppedImage];
+                                    //                                    } else if  (self->_fotgotPunchOutCalled == true) {
+                                    //                                        [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"forgot punchout true "image:finalCroppedImage];
+                                    //                                    }
                                 }];
                                 
                             });
@@ -559,13 +564,13 @@
                                                                                  handler:^(UIAlertAction * _Nonnull action) {
                                     // Handle OK action here
                                     // NSLog(@"OK button tapped");
-                                 //   [self performOKAction];
-                                   
+                                    //   [self performOKAction];
+                                    
                                     if (self.PunchInresultHandler) {
                                         _resultData= @{
                                             @"result": @"face Not Matched",
                                             @"status" : @"punchIn"
-
+                                            
                                         };
                                         self.PunchInresultHandler(self.resultData);
                                         [self.session stopRunning];
@@ -575,7 +580,7 @@
                                         _resultData= @{
                                             @"result": @"face Not Matched",
                                             @"status" : @"punchOut"
-
+                                            
                                         };
                                         self.PunchOutresultHandler(self.resultData);
                                         [self.session stopRunning];
@@ -585,7 +590,7 @@
                                         _resultData= @{
                                             @"result": @"face Not Matched",
                                             @"status" : @"forgotPunchOut"
-
+                                            
                                         };
                                         self.ForgotPunchOutresultHandler(self.resultData);
                                         [self.session stopRunning];
@@ -594,8 +599,8 @@
                                     [self dismissViewControllerAnimated:YES completion:^{
                                         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
                                         [userDefaults setObject:@"face not matched" forKey:@"reason"];
-//                                        [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"face not matched"image:finalCroppedImage];
-
+                                        //                                        [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"face not matched"image:finalCroppedImage];
+                                        
                                     }];// Call your custom method here
                                 }];
                                 [alertController addAction:okAction];
@@ -619,10 +624,10 @@
                                                                          handler:^(UIAlertAction * _Nonnull action) {
                             // Handle OK action here
                             // NSLog(@"OK button tapped");
-                         //   [self performOKAction]; // Call your custom method here
+                            //   [self performOKAction]; // Call your custom method here
                             [self dismissViewControllerAnimated:YES completion:^{
-//                                [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"face not matched"image:finalCroppedImage];
-
+                                //                                [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"face not matched"image:finalCroppedImage];
+                                
                             }];
                         }];
                         [alertController addAction:okAction];
@@ -630,7 +635,7 @@
                     });
                 }
             }
-        
+            
             
         }
         
@@ -638,10 +643,10 @@
 }
 - (void)performOKAction {
     NSLog(@"_finalImage: %@",_finalImage);
-
+    
     [self dismissViewControllerAnimated:YES completion:^{
-      /*  [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"face not matched"image:self->_finalImage]*/;
-
+        /*  [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"face not matched"image:self->_finalImage]*/;
+        
     }];
 }
 
@@ -652,14 +657,14 @@ typedef void (^ImageDataCompletionHandler)(NSData * _Nullable imageData, NSError
 - (void)fetchImageDataFromURL:(NSURL *)imageUrl completionHandler:(ImageDataCompletionHandler)completionHandler {
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLRequest *request = [NSURLRequest requestWithURL:imageUrl];
-
+    
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (error) {
             NSLog(@"Error fetching image data: %@", error.localizedDescription);
             completionHandler(nil, error);
             return;
         }
-
+        
         if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
             if (httpResponse.statusCode == 200) {
@@ -672,19 +677,19 @@ typedef void (^ImageDataCompletionHandler)(NSData * _Nullable imageData, NSError
             }
         }
     }];
-
+    
     [dataTask resume];
 }
 -(UIImage *)fixImageOrientation:(UIImage *)image {
-   if (image.imageOrientation == UIImageOrientationUp) {
-       return image;
-   }
-
-   UIGraphicsBeginImageContextWithOptions(image.size, NO, image.scale);
-   [image drawInRect:(CGRect){0, 0, image.size}];
-   UIImage *fixedImage = UIGraphicsGetImageFromCurrentImageContext();
-   UIGraphicsEndImageContext();
-
-   return fixedImage;
+    if (image.imageOrientation == UIImageOrientationUp) {
+        return image;
+    }
+    
+    UIGraphicsBeginImageContextWithOptions(image.size, NO, image.scale);
+    [image drawInRect:(CGRect){0, 0, image.size}];
+    UIImage *fixedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return fixedImage;
 }
 @end
