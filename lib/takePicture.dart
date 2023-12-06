@@ -82,23 +82,27 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             String originalPath = file.path;
             final Directory? appDir = await getExternalStorageDirectory();
             final String appDirPath = appDir!.path;
+            File file1 = File('${appDir.path}');
 
             // Create a unique filename for the image
             //final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
             //  final String filePath = '$appDirPath/profile.jpg';
 
             // Extract the directory path
-            String directoryPath = path.dirname(appDirPath);
+            String directoryPath = path.dirname(file1.path);
+            print("directoryPath $directoryPath");
 
             // Extract the file extension
             String fileExtension = path.extension(originalPath);
+                        print("fileExtension $fileExtension");
+
 
             // Define the new file name (you can modify it as needed)
             String newFileName = 'profile';
 
             // Create the new file path by combining the directory path, new file name, and file extension
-            String newPath =
-                path.join(directoryPath, '$newFileName$fileExtension');
+            String newPath = path.join(directoryPath, 'files', '$newFileName$fileExtension');
+
             try {
               // ... (previous code)
 
