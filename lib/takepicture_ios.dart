@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
-class TakePictureScreen extends StatefulWidget {
-  const TakePictureScreen({
+class TakePictureScreenIOS extends StatefulWidget {
+  const TakePictureScreenIOS({
     super.key,
     required this.camera,
   });
@@ -15,13 +15,14 @@ class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
 
   @override
-  TakePictureScreenState createState() => TakePictureScreenState();
+  TakePictureScreenIOSState createState() => TakePictureScreenIOSState();
 }
 
-class TakePictureScreenState extends State<TakePictureScreen> {
+class TakePictureScreenIOSState extends State<TakePictureScreenIOS> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   late final String appDirPath;
+  File? savedImage;
   @override
   void initState() {
     super.initState();
@@ -79,59 +80,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
             File file = File(image.path); // Convert XFile to File
             // Get the original file path
-            String originalPath = file.path;
-            originalPath = originalPath.replaceFirst('file://', '');
-            if (Platform.isIOS) {
-              final Directory appDir = await getApplicationDocumentsDirectory();
-              appDirPath = appDir!.path;
-            } else if (Platform.isAndroid) {
-              final Directory? appDir = await getExternalStorageDirectory();
-              appDirPath = appDir!.path;
-            }
-
-            // Create a unique filename for the image
-            //final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-            //  final String filePath = '$appDirPath/profile.jpg';
-
-            // Extract the directory path
-            String directoryPath = path.dirname(appDirPath);
-
-            // Extract the file extension
-            String fileExtension = path.extension(originalPath);
-
-            // Define the new file name (you can modify it as needed)
-            String newFileName = 'profile';
-
-            // Create the new file path by combining the directory path, new file name, and file extension
-            String newPath =
-                path.join(directoryPath, '$newFileName$fileExtension');
-            try {
-              // ... (previous code)
-
-              // Copy the file to the desired directory
-              await file.copy(newPath);
-
-              // Delete the original file if needed
-              await file.delete();
-
-              print("New Captured image path: $newPath");
-
-              // ... (remaining code)
-            } catch (e) {
-              // ... (previous error handling)
-            }
-
-            // Rename the file by moving it to the new path
-            //  File newFile = File(newPath);
-            //  file.renameSync(newPath);
-
-            //  print("New Captured image path: ${newFile.path}");
-            print("imageee2345${image.path}");
-
-            if (!mounted) return;
-            if (image.path.isNotEmpty) {
-              _showAlertDialog(context);
-            }
+            //  String originalPath = file.path;
+            saveImageToDocumentsDirectory(file);
 
             // If the picture was taken, display it on a new screen.
           } catch (e) {
@@ -144,6 +94,58 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     );
   }
 
+  Future<void> saveImageToDocumentsDirectory(File imageFile) async {
+    try {
+      // Get the application documents directory
+      Directory appDocumentsDirectory =
+          await getApplicationDocumentsDirectory();
+
+      // Create a new directory within the documents directory
+      Directory imagesDirectory =
+          Directory('${appDocumentsDirectory.path}/images/');
+      if (!imagesDirectory.existsSync()) {
+        imagesDirectory.createSync(recursive: true);
+      }
+
+      // Copy the image file to the documents directory
+      String imageName = 'profile.jpg'; // Provide a unique name for your image
+       savedImage =
+          await imageFile.copy('${imagesDirectory.path}/$imageName');
+
+     // print('Image saved to: ${savedImage.path}');
+      loadImage();
+      _showAlertDialog(context);
+     // List<int> imageBytes = await savedImage.readAsBytes();
+//print(imageBytes);
+    } catch (e) {
+      print('Error saving image: $e');
+    }
+  }
+Future<void> loadImage() async {
+    try {
+      // Get the application documents directory
+      Directory appDocumentsDirectory =
+          await getApplicationDocumentsDirectory();
+
+      // Create a File object for the saved image
+      String imageName =
+          'profile.jpg'; // Replace with the actual image name
+      File imageFile = File('${appDocumentsDirectory.path}/images/$imageName');
+
+      // Check if the image file exists
+      if (await imageFile.exists()) {
+        setState(() {
+          print(imageFile.path);
+            print("imagefile path retrived");
+        //  savedImage = imageFile;
+        });
+      } else {
+        print('Image not found');
+      }
+    } catch (e) {
+      print('Error loading image: $e');
+    }
+  }
   void _showAlertDialog(BuildContext context) {
     // Create the AlertDialog
     AlertDialog alert = AlertDialog(
@@ -154,7 +156,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         TextButton(
           onPressed: () {
             Platform.isIOS
-                ? Navigator.pushNamed(context, AppRoutes.attendanceIOS)
+                ? Navigator.pushNamed(context, AppRoutes.attendanceIOS , arguments: savedImage)
                 : Navigator.pushNamed(context, AppRoutes.attendance);
           },
           child: GestureDetector(child: Text('OK')),
