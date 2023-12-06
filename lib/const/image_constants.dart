@@ -2,7 +2,7 @@ class ImageConstants {
   static const headerImage = "assets/images.jpg";
   static const splash_img = "assets/splash.png";
   static const appIcon = "assets/app_icon.png";
-  static const logo = "assets/logo_app.png";
+  static const logo = "assets/app_logo.png";
   static const calLeaveImg = "assets/clbg.png";
   static const earnedLeavealImg = "assets/elbg.png";
   static const officialLeaveImg = "assets/ofbg.png";
@@ -19,5 +19,6 @@ class ImageConstants {
       static const String exit = "assets/exit.png";
        static const String logout = "assets/logout.png";
         static const String privacyploicy = "assets/privacy.png";
+         static const String bg = "assets/background.png";
 
 }

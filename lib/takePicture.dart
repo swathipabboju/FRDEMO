@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:cgg_attendance/routes/app_routes.dart';
+import 'package:cgg_attendance/sharedpreferences/share_pref_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
@@ -68,7 +70,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         // Provide an onPressed callback.
         onPressed: () async {
           if (Platform.isIOS) {
-          } else if (Platform.isAndroid) {
+          } 
+          else if (Platform.isAndroid) {
             // Take the Picture in a try / catch block. If anything goes wrong,
             // catch the error.
             try {
@@ -153,7 +156,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       actions: [
         // OK Button
         TextButton(
-          onPressed: () {
+          onPressed: () async {
+           SharedPreferences prefs = await SharedPreferences.getInstance();
+                       await prefs.setString(SharedConstants.userName, "true");
+
+
             Navigator.pushNamed(context, AppRoutes.attendance);
           },
           child: Text('OK'),

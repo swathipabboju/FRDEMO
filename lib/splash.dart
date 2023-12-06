@@ -1,6 +1,8 @@
 import 'package:cgg_attendance/const/image_constants.dart';
 import 'package:cgg_attendance/routes/app_routes.dart';
+import 'package:cgg_attendance/sharedpreferences/share_pref_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashSCreen extends StatefulWidget {
   const SplashSCreen({super.key});
@@ -29,11 +31,21 @@ class _SplashSCreenState extends State<SplashSCreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 2), () async {
-      Navigator.pushReplacementNamed(context, AppRoutes.registration);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userLogin = await prefs.getString(SharedConstants.userName);
+      print("userLogin:$userLogin");
+
+      if (userLogin == "") {
+        Navigator.pushReplacementNamed(context, AppRoutes.registration);
+      } else if(userLogin=="true") {
+        Navigator.pushReplacementNamed(context, AppRoutes.attendance);
+      }else{
+               Navigator.pushReplacementNamed(context, AppRoutes.registration);
+ 
+      }
 
       // final PermissionStatus permission = await Permission.camera.request();
-      // SharedPreferences prefs = await SharedPreferences.getInstance();
-      // String? userLogin = await prefs.getString(SharedConstants.userLogin);
+      ;
 
       //only enterprnur login exist in application
       // if (permission == PermissionStatus.granted) {
