@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#751728</color>
+
+    <color name="colorPrimaryDark">#161733</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="ven_col">#556286</color>
+    <color name="bg">#A4A4A4</color>
+    <color name="white">#FFF</color>
+    <color name="black">#000</color>
+    <color name="appbar">#324755</color>
+
+    <color name="green">#008000</color>
+    <color name="light_green">#228B22</color>
+    <color name="red">#B40404</color>
+    <color name="row_yellow">#FFE87C</color>
+    <color name="light_gray">#A9A9A9</color>
+    <color name="e_gray">#E9E9E9</color>
+    <color name="attendance_gray">#f7fafb</color>
+    <color name="attendance_orange">#ff8a7a</color>
+    <color name="attendance_holiday">#73C6B6</color>
+    <color name="gray">#999999</color>
+    <color name="dark_gray">#BFBFBF</color>
+    <color name="dark_grey">#808080</color>
+    <color name="dashboard_icons_color">#39526c</color>
+
+    <color name="text_selected">#b0003a</color>
+    <color name="text_focused">#E91E63</color>
+    <color name="text_default">#F8BBD0</color>
+    <color name="text_hint_default">#BDBDBD</color>
+    <color name="line_selected">#E91E63</color>
+    <color name="line_focused">#3F51B5</color>
+    <color name="line_default">#C5CAE9</color>
+    <color name="tra">#c3c3c3</color>
+
+    <color name="blue">#1565c0</color>
+    <color name="ash">#eae7e5</color>
+
+    <color name="placeholder_bg">#dddddd</color>
+    <color name="item_name">#0c0c0c</color>
+    <color name="description">#1a1a1a</color>
+    <color name="chef">#777</color>
+    <color name="timestamp">#777</color>
+
+    <color name="holo_purple">#ffaa66cc</color>
+    <color name="holo_orange_dark">#ffff8800</color>
+    <color name="holo_green_dark">#ff669900</color>
+    <color name="maroon">#800000</color>
+    <color name="darker_gray">#696969</color>
+
+    <integer-array name="theme_colors_id">
+        <item>@color/color1</item>
+        <item>@color/color2</item>
+        <item>@color/color3</item>
+        <item>@color/color4</item>
+        <item>@color/color5</item>
+    </integer-array>
+
+    <item name="color1" type="color">#21a5bf</item>
+    <item name="color2" type="color">#0f2959</item>
+    <item name="color3" type="color">#9e4204</item>
+    <item name="color4" type="color">#8e242e</item>
+    <item name="color5" type="color">#039176</item>
+</resources>

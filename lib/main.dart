@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
     final cameras = await availableCameras();
 
   // Get a specific camera from the list of available cameras.
