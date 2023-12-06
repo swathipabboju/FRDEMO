@@ -49,7 +49,7 @@ class TakePictureScreenIOSState extends State<TakePictureScreenIOS> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Capture Image')),
+      appBar: AppBar(title: const Text('Capture Image IOS')),
       // You must wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner until the
       // controller has finished initializing.
@@ -109,13 +109,12 @@ class TakePictureScreenIOSState extends State<TakePictureScreenIOS> {
 
       // Copy the image file to the documents directory
       String imageName = 'profile.jpg'; // Provide a unique name for your image
-       savedImage =
-          await imageFile.copy('${imagesDirectory.path}/$imageName');
+      savedImage = await imageFile.copy('${imagesDirectory.path}/$imageName');
 
-     // print('Image saved to: ${savedImage.path}');
-    //  loadImage();
+      // print('Image saved to: ${savedImage.path}');
+      //  loadImage();
       _showAlertDialog(context);
-     // List<int> imageBytes = await savedImage.readAsBytes();
+      // List<int> imageBytes = await savedImage.readAsBytes();
 //print(imageBytes);
     } catch (e) {
       print('Error saving image: $e');
@@ -145,20 +144,22 @@ class TakePictureScreenIOSState extends State<TakePictureScreenIOS> {
 //     } catch (e) {
 //       print('Error loading image: $e');
 //     }
-    
+
 //   }
-  
+
   void _showAlertDialog(BuildContext context) {
     // Create the AlertDialog
     AlertDialog alert = AlertDialog(
       title: const Text('CGG ATTENDANCE'),
-      content: const Text('Image is succuessfully captured and savesd in device'),
+      content:
+          const Text('Image is succuessfully captured and savesd in device'),
       actions: [
         // OK Button
         TextButton(
           onPressed: () {
             Platform.isIOS
-                ? Navigator.pushNamed(context, AppRoutes.attendanceIOS , arguments: savedImage)
+                ? Navigator.pushNamed(context, AppRoutes.attendanceIOS,
+                    arguments: savedImage)
                 : Navigator.pushNamed(context, AppRoutes.attendance);
           },
           child: GestureDetector(child: const Text('OK')),

@@ -37,34 +37,12 @@ class _SplashSCreenState extends State<SplashSCreen> {
 
       if (userLogin == "") {
         Navigator.pushReplacementNamed(context, AppRoutes.registration);
-      } else if(userLogin=="true") {
+      } else if (userLogin == "true") {
         Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
-      }else{
-         Navigator.pushReplacementNamed(context, AppRoutes.registration);
-
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.registration);
       }
-
-      // final PermissionStatus permission = await Permission.camera.request();
       ;
-
-      //only enterprnur login exist in application
-      // if (permission == PermissionStatus.granted) {
-      //   if (userLogin == "SucessMsg") {
-      //     Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
-      //   } else {
-      //     Navigator.pushReplacementNamed(context, AppRoutes.entereprenurlogin);
-      //   }
-
-      //   print("permission granted");
-      // } else {
-      //   print("permission bot granted");
-      //   if (userLogin == "SucessMsg") {
-      //     Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
-      //   } else {
-      //     Navigator.pushReplacementNamed(context, AppRoutes.entereprenurlogin);
-      //   }
-
-      // }
     });
   }
 }

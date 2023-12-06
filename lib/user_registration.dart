@@ -40,13 +40,13 @@ class _UserRegistrationState extends State<UserRegistration> {
               color: Colors.white,
               child: Column(
                 children: [
-                 Padding(
-                   padding: const EdgeInsets.all(10.0),
-                   child: const Text(
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: const Text(
                       "User Registration",
                       style: TextStyle(fontSize: 21, color: Colors.black),
                     ),
-                 ),
+                  ),
                   SizedBox(
                     width: 20,
                     height: 20,
@@ -126,6 +126,7 @@ class _UserRegistrationState extends State<UserRegistration> {
           savedProfilePath = imageFile.path;
 
           print("imagefile path retrived");
+          print("savedProfilePath $savedProfilePath");
           //  savedImage = imageFile;
         });
       } else {

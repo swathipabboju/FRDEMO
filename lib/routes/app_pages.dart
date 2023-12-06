@@ -7,6 +7,7 @@ import 'package:cgg_attendance/splash.dart';
 import 'package:cgg_attendance/takePicture.dart';
 import 'package:cgg_attendance/takepicture_ios.dart';
 import 'package:cgg_attendance/user_registration.dart';
+import 'package:cgg_attendance/view/faceRecognitionView.dart';
 import 'package:flutter/material.dart';
 
 class AppPages {
@@ -17,7 +18,9 @@ class AppPages {
       AppRoutes.attendance: (context) => Attendance(),
       AppRoutes.attendanceIOS: (context) => AttendanceIOS(),
       AppRoutes.dashboard: (context) => DashboardScreen(),
-     // AppRoutes.takecameraIOS: (context) => TakePictureScreenIOS(),
+      AppRoutes.FaceRecognitionView: ((context) => FaceRecognitionView()),
+
+      // AppRoutes.takecameraIOS: (context) => TakePictureScreenIOS(),
     };
   }
 }
