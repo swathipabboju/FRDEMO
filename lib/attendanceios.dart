@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:cgg_attendance/routes/app_routes.dart';
+import 'package:cgg_attendance/takepicture_ios.dart';
+import 'package:cgg_attendance/user_registration.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +16,7 @@ class AttendanceIOS extends StatefulWidget {
 
 class _AttendanceState extends State<AttendanceIOS> {
   MethodChannel channel = MethodChannel("FlutterFramework/swift_native");
-  
+
   Future<void> _handlePunchResultFromiOS(
     dynamic result,
     BuildContext context,
@@ -42,7 +45,8 @@ class _AttendanceState extends State<AttendanceIOS> {
                   CupertinoDialogAction(
                     child: Text('OK'),
                     onPressed: () {
-                      Navigator.pop(context); // Close the alert
+                      Navigator.pushNamed(
+                          context, AppRoutes.registration); // Close the alert
                     },
                   ),
                 ],
@@ -55,7 +59,7 @@ class _AttendanceState extends State<AttendanceIOS> {
 
   @override
   Widget build(BuildContext context) {
-final savedImage = ModalRoute.of(context)!.settings.arguments as File?;
+    final savedImage = ModalRoute.of(context)!.settings.arguments as File?;
     Future<void> faceRecogPunchOut() async {
       try {
         await channel.invokeMethod('getPunchOutIOS');

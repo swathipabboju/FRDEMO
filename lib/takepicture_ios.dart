@@ -113,7 +113,7 @@ class TakePictureScreenIOSState extends State<TakePictureScreenIOS> {
           await imageFile.copy('${imagesDirectory.path}/$imageName');
 
      // print('Image saved to: ${savedImage.path}');
-      loadImage();
+    //  loadImage();
       _showAlertDialog(context);
      // List<int> imageBytes = await savedImage.readAsBytes();
 //print(imageBytes);
@@ -121,36 +121,38 @@ class TakePictureScreenIOSState extends State<TakePictureScreenIOS> {
       print('Error saving image: $e');
     }
   }
-Future<void> loadImage() async {
-    try {
-      // Get the application documents directory
-      Directory appDocumentsDirectory =
-          await getApplicationDocumentsDirectory();
+// Future<void> loadImage() async {
+//     try {
+//       // Get the application documents directory
+//       Directory appDocumentsDirectory =
+//           await getApplicationDocumentsDirectory();
 
-      // Create a File object for the saved image
-      String imageName =
-          'profile.jpg'; // Replace with the actual image name
-      File imageFile = File('${appDocumentsDirectory.path}/images/$imageName');
+//       // Create a File object for the saved image
+//       String imageName =
+//           'profile.jpg'; // Replace with the actual image name
+//       File imageFile = File('${appDocumentsDirectory.path}/images/$imageName');
 
-      // Check if the image file exists
-      if (await imageFile.exists()) {
-        setState(() {
-          print(imageFile.path);
-            print("imagefile path retrived");
-        //  savedImage = imageFile;
-        });
-      } else {
-        print('Image not found');
-      }
-    } catch (e) {
-      print('Error loading image: $e');
-    }
-  }
+//       // Check if the image file exists
+//       if (await imageFile.exists()) {
+//         setState(() {
+//           print(imageFile.path);
+//             print("imagefile path retrived");
+//         //  savedImage = imageFile;
+//         });
+//       } else {
+//         print('Image not found');
+//       }
+//     } catch (e) {
+//       print('Error loading image: $e');
+//     }
+    
+//   }
+  
   void _showAlertDialog(BuildContext context) {
     // Create the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text('CGG ATTENDANCE'),
-      content: Text('Image is succuessfully captured and savesd in device'),
+      title: const Text('CGG ATTENDANCE'),
+      content: const Text('Image is succuessfully captured and savesd in device'),
       actions: [
         // OK Button
         TextButton(
@@ -159,7 +161,7 @@ Future<void> loadImage() async {
                 ? Navigator.pushNamed(context, AppRoutes.attendanceIOS , arguments: savedImage)
                 : Navigator.pushNamed(context, AppRoutes.attendance);
           },
-          child: GestureDetector(child: Text('OK')),
+          child: GestureDetector(child: const Text('OK')),
         ),
       ],
     );
