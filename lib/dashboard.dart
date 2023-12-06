@@ -1,3 +1,4 @@
+import 'package:cgg_attendance/const/image_constants.dart';
 import 'package:cgg_attendance/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 
@@ -15,48 +16,64 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: const Text('Dashboard'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(children: <Widget>[
+        Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage(ImageConstants.bg), fit: BoxFit.fill),
+          ),
+        ),
+        Column(
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.attendance);
-              },
-              child: const Card(
-                elevation: 3.0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Text(
-                      'Attendance',
-                      style: TextStyle(fontSize: 18.0),
-                    ),
-                  ),
-                ),
-              ),
+              Image.asset(
+              ImageConstants.logo,
+              width: 200,
+              height: 200,
             ),
-            
-            const SizedBox(height: 16.0),
-            GestureDetector(
-              onTap: () {},
-              child: const Card(
-                elevation: 3.0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Text(
-                      'Delete User',
-                      style: TextStyle(fontSize: 18.0),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.attendance);
+                    },
+                    child: const Card(
+                      elevation: 3.0,
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text(
+                            'Attendance',
+                            style: TextStyle(fontSize: 18.0),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 16.0),
+                  GestureDetector(
+                    onTap: () {},
+                    child: const Card(
+                      elevation: 3.0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text(
+                            'Delete User',
+                            style: TextStyle(fontSize: 18.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-      ),
+      ]),
     );
   }
 }

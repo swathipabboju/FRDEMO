@@ -1,3 +1,4 @@
+import 'package:cgg_attendance/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -82,15 +83,13 @@ class _AttendanceState extends State<Attendance> {
       appBar: AppBar(
         title: Text("Attendance"),
       ),
-      body: Center(
-        child: Text(
-          'Content of the selected tab',
-          style: TextStyle(fontSize: 20),
-        ),
+      body: Container(
+        color: AppColors.primaryDark,
+        
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar:  BottomNavigationBar(
         items: [
-          BottomNavigationBarItem(
+           BottomNavigationBarItem(
             icon: Icon(Icons.arrow_forward),
             label: 'Punch In',
             backgroundColor: Colors.lightGreen,
@@ -102,7 +101,7 @@ class _AttendanceState extends State<Attendance> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white,
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),

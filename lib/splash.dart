@@ -40,8 +40,8 @@ class _SplashSCreenState extends State<SplashSCreen> {
       } else if(userLogin=="true") {
         Navigator.pushReplacementNamed(context, AppRoutes.attendance);
       }else{
-               Navigator.pushReplacementNamed(context, AppRoutes.registration);
- 
+         Navigator.pushReplacementNamed(context, AppRoutes.registration);
+
       }
 
       // final PermissionStatus permission = await Permission.camera.request();

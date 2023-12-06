@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:cgg_attendance/routes/app_routes.dart';
 import 'package:cgg_attendance/sharedpreferences/share_pref_constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -70,8 +71,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         // Provide an onPressed callback.
         onPressed: () async {
           if (Platform.isIOS) {
-          } 
-          else if (Platform.isAndroid) {
+          } else if (Platform.isAndroid) {
             // Take the Picture in a try / catch block. If anything goes wrong,
             // catch the error.
             try {
@@ -133,7 +133,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
               if (!mounted) return;
               if (image.path.isNotEmpty) {
-                _showAlertDialog(context);
+                _showCupertinoAlertDialog(context);
               }
 
               // If the picture was taken, display it on a new screen.
@@ -148,31 +148,25 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     );
   }
 
-  void _showAlertDialog(BuildContext context) {
-    // Create the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text('CGG ATTENDANCE'),
-      content: Text('Image is succuessfully captured and savesd in device'),
-      actions: [
-        // OK Button
-        TextButton(
-          onPressed: () async {
-           SharedPreferences prefs = await SharedPreferences.getInstance();
-                       await prefs.setString(SharedConstants.userName, "true");
-
-
-            Navigator.pushNamed(context, AppRoutes.attendance);
-          },
-          child: Text('OK'),
-        ),
-      ],
-    );
-
-    // Show the dialog
-    showDialog(
+  void _showCupertinoAlertDialog(BuildContext context) {
+    showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return CupertinoAlertDialog(
+          title: Text('CGG ATTENDANCE'),
+          content:
+              Text('Image is successfully captured and saved in the device'),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                await prefs.setString(SharedConstants.userName, "true");
+                Navigator.pushNamed(context, AppRoutes.attendance);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
       },
     );
   }
