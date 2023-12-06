@@ -21,7 +21,7 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  late final String appDirPath;
+
   @override
   void initState() {
     super.initState();
@@ -67,80 +67,77 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       floatingActionButton: FloatingActionButton(
         // Provide an onPressed callback.
         onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {
-            // Ensure that the camera is initialized.
-            await _initializeControllerFuture;
-
-            // Attempt to take a picture and get the file `image`
-            // where it was saved.
-            final image = await _controller.takePicture();
-
-            File file = File(image.path); // Convert XFile to File
-            // Get the original file path
-            String originalPath = file.path;
-            originalPath = originalPath.replaceFirst('file://', '');
-            if (Platform.isIOS) {
-              final Directory appDir = await getApplicationDocumentsDirectory();
-              appDirPath = appDir!.path;
-            } else if (Platform.isAndroid) {
-              final Directory? appDir = await getExternalStorageDirectory();
-              appDirPath = appDir!.path;
-            }
-           // File file1 = File('${appDir.path}');
-
-            // Create a unique filename for the image
-            //final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-            //  final String filePath = '$appDirPath/profile.jpg';
-
-            // Extract the directory path
-          //  String directoryPath = path.dirname(file1.path);
-            //print("directoryPath $directoryPath");
-
-            // Extract the file extension
-            String fileExtension = path.extension(originalPath);
-                        print("fileExtension $fileExtension");
-
-
-            // Define the new file name (you can modify it as needed)
-            String newFileName = 'profile';
-
-            // Create the new file path by combining the directory path, new file name, and file extension
-            String newPath = path.join(appDirPath, 'files', '$newFileName$fileExtension');
-
+          if (Platform.isIOS) {
+          } else if (Platform.isAndroid) {
+            // Take the Picture in a try / catch block. If anything goes wrong,
+            // catch the error.
             try {
-              // ... (previous code)
+              // Ensure that the camera is initialized.
+              await _initializeControllerFuture;
 
-              // Copy the file to the desired directory
-              await file.copy(newPath);
+              // Attempt to take a picture and get the file image
+              // where it was saved.
+              final image = await _controller.takePicture();
 
-              // Delete the original file if needed
-              await file.delete();
+              File file = File(image.path); // Convert XFile to File
+              // Get the original file path
+              String originalPath = file.path;
+              final Directory? appDir = await getExternalStorageDirectory();
+              final String appDirPath = appDir!.path;
+              File file1 = File('${appDir.path}');
 
-              print("New Captured image path: $newPath");
+              // Create a unique filename for the image
+              //final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+              //  final String filePath = '$appDirPath/profile.jpg';
 
-              // ... (remaining code)
+              // Extract the directory path
+              String directoryPath = path.dirname(file1.path);
+              print("directoryPath $directoryPath");
+
+              // Extract the file extension
+              String fileExtension = path.extension(originalPath);
+              print("fileExtension $fileExtension");
+
+              // Define the new file name (you can modify it as needed)
+              String newFileName = 'profile';
+
+              // Create the new file path by combining the directory path, new file name, and file extension
+              String newPath = path.join(
+                  directoryPath, 'files', '$newFileName$fileExtension');
+
+              try {
+                // ... (previous code)
+
+                // Copy the file to the desired directory
+                await file.copy(newPath);
+
+                // Delete the original file if needed
+                await file.delete();
+
+                print("New Captured image path: $newPath");
+
+                // ... (remaining code)
+              } catch (e) {
+                // ... (previous error handling)
+              }
+
+              // Rename the file by moving it to the new path
+              //  File newFile = File(newPath);
+              //  file.renameSync(newPath);
+
+              //  print("New Captured image path: ${newFile.path}");
+              print("imageee2345${image.path}");
+
+              if (!mounted) return;
+              if (image.path.isNotEmpty) {
+                _showAlertDialog(context);
+              }
+
+              // If the picture was taken, display it on a new screen.
             } catch (e) {
-              // ... (previous error handling)
+              // If an error occurs, log the error to the console.
+              print(e);
             }
-
-            // Rename the file by moving it to the new path
-            //  File newFile = File(newPath);
-            //  file.renameSync(newPath);
-
-            //  print("New Captured image path: ${newFile.path}");
-            print("imageee2345${image.path}");
-
-            if (!mounted) return;
-            if (image.path.isNotEmpty) {
-              _showAlertDialog(context);
-            }
-
-            // If the picture was taken, display it on a new screen.
-          } catch (e) {
-            // If an error occurs, log the error to the console.
-            print(e);
           }
         },
         child: const Icon(Icons.camera_alt),
@@ -157,11 +154,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         // OK Button
         TextButton(
           onPressed: () {
-            Platform.isIOS
-                ? Navigator.pushNamed(context, AppRoutes.attendanceIOS)
-                : Navigator.pushNamed(context, AppRoutes.attendance);
+            Navigator.pushNamed(context, AppRoutes.attendance);
           },
-          child: GestureDetector(child: Text('OK')),
+          child: Text('OK'),
         ),
       ],
     );

@@ -1,6 +1,7 @@
 class AppRoutes {
   AppRoutes._();
-  static const initial = registration;
+  static const initial = splash;
+  static const splash = "/splash";
   static const registration = "/registration";
   static const  attendance = "/attendance";
   static const attendanceIOS = "/attendanceIOS";
