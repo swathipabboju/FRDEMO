@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cgg_attendance/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,11 +87,10 @@ class _AttendanceState extends State<Attendance> {
       ),
       body: Container(
         color: AppColors.primaryDark,
-        
       ),
-      bottomNavigationBar:  BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
         items: [
-           BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.arrow_forward),
             label: 'Punch In',
             backgroundColor: Colors.lightGreen,
@@ -113,9 +114,17 @@ class _AttendanceState extends State<Attendance> {
       _selectedIndex = index;
       print("_selectedIndex$_selectedIndex");
       if (_selectedIndex == 0) {
-        _faceRecogPunchIn();
+        if (Platform.isIOS) {
+          // _faceRecogPunchIn();
+        } else if (Platform.isAndroid) {
+          _faceRecogPunchIn();
+        }
       } else if (_selectedIndex == 1) {
-        _faceRecogPunchOut();
+        if (Platform.isIOS) {
+          // _faceRecogPunchIn();
+        } else if (Platform.isAndroid) {
+          _faceRecogPunchOut();
+        }
       }
     });
   }

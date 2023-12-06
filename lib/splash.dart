@@ -38,7 +38,7 @@ class _SplashSCreenState extends State<SplashSCreen> {
       if (userLogin == "") {
         Navigator.pushReplacementNamed(context, AppRoutes.registration);
       } else if(userLogin=="true") {
-        Navigator.pushReplacementNamed(context, AppRoutes.attendance);
+        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
       }else{
          Navigator.pushReplacementNamed(context, AppRoutes.registration);
 

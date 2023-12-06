@@ -24,7 +24,7 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-
+  File? savedImage;
   @override
   void initState() {
     super.initState();
@@ -71,6 +71,24 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         // Provide an onPressed callback.
         onPressed: () async {
           if (Platform.isIOS) {
+            try {
+              // Ensure that the camera is initialized.
+              await _initializeControllerFuture;
+
+              // Attempt to take a picture and get the file `image`
+              // where it was saved.
+              final image = await _controller.takePicture();
+
+              File file = File(image.path); // Convert XFile to File
+              // Get the original file path
+              //  String originalPath = file.path;
+              saveImageToDocumentsDirectory(file);
+
+              // If the picture was taken, display it on a new screen.
+            } catch (e) {
+              // If an error occurs, log the error to the console.
+              print(e);
+            }
           } else if (Platform.isAndroid) {
             // Take the Picture in a try / catch block. If anything goes wrong,
             // catch the error.
@@ -148,6 +166,33 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     );
   }
 
+  Future<void> saveImageToDocumentsDirectory(File imageFile) async {
+    try {
+      // Get the application documents directory
+      Directory appDocumentsDirectory =
+          await getApplicationDocumentsDirectory();
+
+      // Create a new directory within the documents directory
+      Directory imagesDirectory =
+          Directory('${appDocumentsDirectory.path}/images/');
+      if (!imagesDirectory.existsSync()) {
+        imagesDirectory.createSync(recursive: true);
+      }
+
+      // Copy the image file to the documents directory
+      String imageName = 'profile.jpg'; // Provide a unique name for your image
+      savedImage = await imageFile.copy('${imagesDirectory.path}/$imageName');
+
+      // print('Image saved to: ${savedImage.path}');
+      //  loadImage();
+      _showCupertinoAlertDialog(context);
+      // List<int> imageBytes = await savedImage.readAsBytes();
+//print(imageBytes);
+    } catch (e) {
+      print('Error saving image: $e');
+    }
+  }
+
   void _showCupertinoAlertDialog(BuildContext context) {
     showCupertinoDialog(
       context: context,
@@ -161,7 +206,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 await prefs.setString(SharedConstants.userName, "true");
-                Navigator.pushNamed(context, AppRoutes.attendance);
+                Navigator.pushNamed(context, AppRoutes.dashboard);
               },
               child: Text('OK'),
             ),
