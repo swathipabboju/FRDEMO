@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
@@ -80,9 +81,17 @@ class _AttendanceState extends State<Attendance> {
       setState(() {
         Appconstants.sourceFile = localImage ?? File("");
       });
+      String base64File = await fileToBase64(Appconstants.sourceFile);
+      //print("base64File $base64File");
       print("local image is ${localImage?.path}");
       print("Appconstants.sourceFile ${Appconstants.sourceFile.path}");
     });
+  }
+
+  Future<String> fileToBase64(File file) async {
+    List<int> imageBytes = await file.readAsBytes();
+    String base64Image = base64Encode(imageBytes);
+    return base64Image;
   }
 
   @override
@@ -171,6 +180,7 @@ class _AttendanceState extends State<Attendance> {
       // Get the application documents directory for iOS
       Directory appDocumentsDirectory =
           await getApplicationDocumentsDirectory();
+      print("ios path is ${appDocumentsDirectory.path}");
       String imagesPath = '${appDocumentsDirectory.path}/images/profile.jpg';
 
       File imageFile = File(imagesPath);

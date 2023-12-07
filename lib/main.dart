@@ -13,7 +13,7 @@ Future<void> main() async {
   final cameras = await availableCameras();
 
   // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras.last;
+  final firstCamera = cameras[1];
 
   // Obtain a list of the available cameras on the device.
 // runApp(

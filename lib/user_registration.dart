@@ -104,7 +104,7 @@ class _UserRegistrationState extends State<UserRegistration> {
       loadImage();
       // Get a specific camera from the list of available cameras.
       setState(() {
-        firstCamera = cameras.last;
+        firstCamera = cameras[1];
       });
     });
   }

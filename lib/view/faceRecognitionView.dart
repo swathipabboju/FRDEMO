@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cgg_attendance/routes/app_routes.dart';
 import 'package:cgg_attendance/view/FR%20flutter/antiSpoofing.dart';
@@ -6,7 +8,9 @@ import 'package:cgg_attendance/view/FR%20flutter/appconstants.dart';
 import 'package:cgg_attendance/viewModel/faceMatchingViewModel.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tflite_flutter/tflite_flutter.dart' as tflite;
 
@@ -18,6 +22,8 @@ class FaceRecognitionView extends StatefulWidget {
 }
 
 class _FaceRecognitionViewState extends State<FaceRecognitionView> {
+  MethodChannel channel = MethodChannel("FlutterFramework/swift_native");
+
   File? faceRecog;
   Face? detectedFace;
   File? cropSaveFile;
@@ -29,61 +35,139 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
   static const int LAPLACE_THRESHOLD = 50;
   static const int LAPLACIAN_THRESHOLD = 250;
   double? antiSpoofingScore;
+  String base64File = '';
+  String base64Image = '';
+  File base64toFile = File('');
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //base();
+  }
+
+  base() async {
+    base64File = await fileToBase64(Appconstants.sourceFile);
+    // Remove the data header before decoding
+    final RegExp regex = RegExp(r'^data:image\/\w+;base64,');
+    base64Image = base64File.replaceFirst(regex, '');
+    //print("base64Image $base64Image");
+  }
+
+  Future<void> faceRecogPunchIn(local, captured) async {
+    try {
+      Map<String, dynamic> arguments = {
+        'local': local, // Replace with your argument key-value pairs
+        'captured': captured,
+      };
+
+      await channel.invokeMethod('getPunchInIOS', arguments);
+      print("Method invoked successfully");
+    } on PlatformException catch (e) {
+      print("Error invoking method: ${e.message}");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    Uint8List bytes = base64Decode(base64Image);
+    print("cap img is--- $_capturedImage");
     return Scaffold(
         appBar: AppBar(
           title: const Text('FaceCamera example app'),
         ),
         body: Builder(builder: (context) {
-          return _capturedImage == null
-              ? SmartFaceCamera(
-                  showControls: false,
-                  autoCapture: true,
-                  defaultCameraLens: CameraLens.front,
-                  onCapture: (File? image) async {
-                    if (image != null) {
-                      // Replace the captured image with the new one
-                      _capturedImage = image;
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                SmartFaceCamera(
+                    showControls: false,
+                    autoCapture: true,
+                    defaultCameraLens: CameraLens.front,
+                    onCapture: (File? image) async {
+                      if (image != null) {
+                        // Replace the captured image with the new one
+                        _capturedImage = image;
+                        String base64File = await fileToBase64(_capturedImage!);
+                        final RegExp regex =
+                            RegExp(r'^data:image\/\w+;base64,');
+                        base64Image = base64File.replaceFirst(regex, '');
 
-                      print("captured image path is ${image.path}");
-                      //await cropImage(_capturedImage, context);
+                        String filePath =
+                            'example_image.jpg'; // File path where you want to save the image
 
+                        base64toFile = await createFileFromBase64String(
+                            base64Image, filePath);
+
+                        print("captured image path is ${image.path}");
+                        //print("base64File $base64File");
+
+                        /*  if (base64toFile != null) {
+                          File? localFile = await rotateLocalImageFile(
+                              Appconstants.sourceFile.path);
+                          File? capturedFile =
+                              await rotateLocalImageFile(base64toFile.path);
+                          await faceRecogPunchIn(
+                              localFile?.path, capturedFile?.path);
+                        } */
+
+                        await cropImage(base64toFile, context);
+
+                        setState(() {});
+                      }
                       setState(() {});
-                    }
-                  },
-                  /* onCapture: (File? image) async {
-                //setState(() => _capturedImage = image);
-                print("captured image path is 111111111111 ${image?.parent}");
-                await cropImage(image, context);
-                print("source image id ${Appconstants.sourceFile}");
-                setState(() {});
-              }, */
-                  onFaceDetected: (Face? face) {
-                    print("Face detected ${face?.boundingBox}");
-                    setState(() {
-                      detectedFace = face;
-                    });
-                    //Do something
-                  },
-                  messageBuilder: (context, face) {
-                    if (face == null) {
-                      return _message('Place your face in the camera');
-                    }
-                    if (!face.wellPositioned) {
-                      return _message('Center your face in the square');
-                    }
-                    return const SizedBox.shrink();
-                  })
-              : Container(
+                    },
+                    /* onCapture: (File? image) async {
+                      //setState(() => _capturedImage = image);
+                      print("captured image path is 111111111111 ${image?.parent}");
+                      await cropImage(image, context);
+                      print("source image id ${Appconstants.sourceFile}");
+                      setState(() {});
+                    }, */
+                    onFaceDetected: (Face? face) {
+                      print("Face detected ${face?.boundingBox}");
+                      setState(() {
+                        detectedFace = face;
+                      });
+                      //Do something
+                    },
+                    messageBuilder: (context, face) {
+                      if (face == null) {
+                        return _message('Place your face in the camera');
+                      }
+                      if (!face.wellPositioned) {
+                        return _message('Center your face in the square');
+                      }
+                      return const SizedBox.shrink();
+                    }),
+                /* Container(
+                    child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Image.file(base64toFile),
+                      Image.file(Appconstants.sourceFile),
+                      Image.memory(
+                        bytes,
+                        fit: BoxFit.cover, // Adjust the BoxFit as needed
+                      )
+                    ],
+                  ),
+                )) */
+              ],
+            ),
+          );
+          /* Container(
                   child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Image.file(_capturedImage ?? File("")),
-                      Image.file(Appconstants.sourceFile)
+                      Image.file(_capturedImage!),
+                      Image.file(Appconstants.sourceFile),
+                      Image.memory(
+                        bytes,
+                        fit: BoxFit.cover, // Adjust the BoxFit as needed
+                      )
                     ],
                   ),
-                ));
+                )); */
         }));
   }
 
@@ -123,6 +207,7 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
           faceRecog = cropSaveFile;
 
           print("face recognised!!!!!!!!!!!!!!");
+          //
 
           await faceMatchingProvider.faceMatchingApiCall(
               context, cropSaveFile!);
@@ -204,5 +289,58 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
 
   img.Pixel getPixel(img.Image image, int x, int y) {
     return image.getPixel(x, y);
+  }
+
+  Future<String> fileToBase64(File file) async {
+    List<int> imageBytes = await file.readAsBytes();
+    String base64Image = base64Encode(imageBytes);
+    return base64Image;
+  }
+
+  Future<File> createFileFromBase64String(
+      String base64String, String filePath) async {
+    Uint8List bytes = base64Decode(base64String);
+
+    // Get the directory for the app's documents directory
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final File file = File('${directory.path}/$filePath');
+
+    // Write the file
+    await file.writeAsBytes(bytes);
+    return file;
+  }
+
+  Future<File?> rotateLocalImageFile(String filePath) async {
+    File? rotatedFile;
+
+    // Load the image file
+    File imageFile = File(filePath);
+    Uint8List imageBytes = await imageFile.readAsBytes();
+    img.Image? image = img.decodeImage(imageBytes);
+
+    if (image != null) {
+      // Rotate the image by 90 degrees clockwise
+      img.Image rotatedImage = img.copyRotate(image, angle: 0);
+
+      // Get platform-specific directory
+      Directory? appDirectory;
+      if (Platform.isAndroid) {
+        appDirectory = await getExternalStorageDirectory();
+      } else if (Platform.isIOS) {
+        appDirectory = await getApplicationDocumentsDirectory();
+      }
+
+      if (appDirectory != null) {
+        // Save the rotated image to the platform-specific directory
+        String fileName =
+            'rotated_local_image.png'; // Change the file name as needed
+        String filePath = '${appDirectory.path}/$fileName';
+
+        rotatedFile = File(filePath);
+        await rotatedFile.writeAsBytes(img.encodePng(rotatedImage));
+      }
+    }
+
+    return rotatedFile;
   }
 }
