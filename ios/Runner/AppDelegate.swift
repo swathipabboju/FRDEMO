@@ -31,14 +31,23 @@ channel.setMethodCallHandler { (call, result) in
         print(arg1)
           
          // if let imagePath = arg2 { // Replace this with your image file path
-              if let localImg = UIImage(contentsOfFile: arg1) {
-                  print("localImg",localImg)
-                  // Now 'image' contains the UIImage loaded from the file path
-                  // You can use this UIImage as needed, such as displaying it in a UIImageView
-                  
-                  // For example, if you have a UIImageView named 'imageView':
-                //  imageView.image = image
-              } 
+//              if let localImg = UIImage(contentsOfFile: arg1) {
+//                  print("localImg",localImg)
+//                  // Now 'image' contains the UIImage loaded from the file path
+//                  // You can use this UIImage as needed, such as displaying it in a UIImageView
+//                  
+//                  // For example, if you have a UIImageView named 'imageView':
+//                //  imageView.image = image
+//              } 
+           
+          if let localImg1 = UIImage(contentsOfFile: arg1) {
+              print("localImg",localImg1)
+              // Now 'image' contains the UIImage loaded from the file path
+              // You can use this UIImage as needed, such as displaying it in a UIImageView
+              
+              // For example, if you have a UIImageView named 'imageView':
+            //  imageView.image = image
+          }
           else {
                   print("Unable to create UIImage from the file path")
               }

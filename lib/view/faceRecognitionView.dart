@@ -42,7 +42,7 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    //base();
+    base();
   }
 
   base() async {
@@ -101,11 +101,11 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
                         print("captured image path is ${image.path}");
                         //print("base64File $base64File");
 
-                        /*  if (base64toFile != null) {
+                        /* if (base64toFile != null) {
                           File? localFile = await rotateLocalImageFile(
                               Appconstants.sourceFile.path);
                           File? capturedFile =
-                              await rotateLocalImageFile(base64toFile.path);
+                              await rotateCapturedImageFile(base64toFile.path);
                           await faceRecogPunchIn(
                               localFile?.path, capturedFile?.path);
                         } */
@@ -139,7 +139,7 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
                       }
                       return const SizedBox.shrink();
                     }),
-                /* Container(
+                /*  Container(
                     child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -334,6 +334,40 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
         // Save the rotated image to the platform-specific directory
         String fileName =
             'rotated_local_image.png'; // Change the file name as needed
+        String filePath = '${appDirectory.path}/$fileName';
+
+        rotatedFile = File(filePath);
+        await rotatedFile.writeAsBytes(img.encodePng(rotatedImage));
+      }
+    }
+
+    return rotatedFile;
+  }
+
+  Future<File?> rotateCapturedImageFile(String filePath) async {
+    File? rotatedFile;
+
+    // Load the image file
+    File imageFile = File(filePath);
+    Uint8List imageBytes = await imageFile.readAsBytes();
+    img.Image? image = img.decodeImage(imageBytes);
+
+    if (image != null) {
+      // Rotate the image by 90 degrees clockwise
+      img.Image rotatedImage = img.copyRotate(image, angle: 0);
+
+      // Get platform-specific directory
+      Directory? appDirectory;
+      if (Platform.isAndroid) {
+        appDirectory = await getExternalStorageDirectory();
+      } else if (Platform.isIOS) {
+        appDirectory = await getApplicationDocumentsDirectory();
+      }
+
+      if (appDirectory != null) {
+        // Save the rotated image to the platform-specific directory
+        String fileName =
+            'rotated_captured_image.png'; // Change the file name as needed
         String filePath = '${appDirectory.path}/$fileName';
 
         rotatedFile = File(filePath);

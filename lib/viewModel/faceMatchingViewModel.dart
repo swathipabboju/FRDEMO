@@ -32,7 +32,7 @@ class FaceMatchingViewModel with ChangeNotifier {
         await FaceMatching().loadModel(file, Appconstants.sourceFile);
     print("faceMatchScore local ${faceMatchScore}");
 
-    if (faceMatchScore > 0.8) {
+    if (faceMatchScore > 0.9) {
       Alerts.showAlertDialog(context, "Face Matched Successfully.",
           imagePath: "assets/assets_correct.png",
           Title: "Face Recognition", onpressed: () {
@@ -42,7 +42,8 @@ class FaceMatchingViewModel with ChangeNotifier {
       // Campreefee api call
 
       print("campreefee api call----------------");
-
+      print("local file is $localFile");
+      print("capured file is $capturedFile");
       final response = await _faceMatchingRepository.FaceMatchingInfoNew(
           localFile!, capturedFile!, context);
       print(
@@ -54,7 +55,7 @@ class FaceMatchingViewModel with ChangeNotifier {
               response.result![0].faceMatches != null &&
               response.result![0].faceMatches!.isNotEmpty &&
               response.result![0].faceMatches![0].similarity != null &&
-              response.result![0].faceMatches![0].similarity! > 0.9) {
+              response.result![0].faceMatches![0].similarity! > 0.96) {
             Alerts.showAlertDialog(context, "Face Matched Successfully.",
                 imagePath: "assets/assets_correct.png",
                 Title: "Face Recognition", onpressed: () {
@@ -187,6 +188,40 @@ class FaceMatchingViewModel with ChangeNotifier {
     return rotatedFile;
   }
 
+  /* Future<File?> rotateLocalImageFile(String filePath) async {
+    File? rotatedFile;
+
+    // Load the image file
+    File imageFile = File(filePath);
+    Uint8List imageBytes = await imageFile.readAsBytes();
+    img.Image? image = img.decodeImage(imageBytes);
+
+    if (image != null) {
+      // Rotate the image by 90 degrees clockwise
+      img.Image rotatedImage = img.copyRotate(image, angle: 0);
+
+      // Get platform-specific directory
+      Directory? appDirectory;
+      if (Platform.isAndroid) {
+        appDirectory = await getExternalStorageDirectory();
+      } else if (Platform.isIOS) {
+        appDirectory = await getApplicationDocumentsDirectory();
+      }
+
+      if (appDirectory != null) {
+        // Save the rotated image to the platform-specific directory
+        String fileName =
+            'rotated_local_image.png'; // Change the file name as needed
+        String filePath = '${appDirectory.path}/$fileName';
+
+        rotatedFile = File(filePath);
+        await rotatedFile.writeAsBytes(img.encodePng(rotatedImage));
+      }
+    }
+
+    return rotatedFile;
+  } */
+
   Future<File?> rotateCapturedImageFile(String filePath) async {
     File? rotatedFile;
 
@@ -220,4 +255,38 @@ class FaceMatchingViewModel with ChangeNotifier {
 
     return rotatedFile;
   }
+
+  /* Future<File?> rotateCapturedImageFile(String filePath) async {
+    File? rotatedFile;
+
+    // Load the image file
+    File imageFile = File(filePath);
+    Uint8List imageBytes = await imageFile.readAsBytes();
+    img.Image? image = img.decodeImage(imageBytes);
+
+    if (image != null) {
+      // Rotate the image by 90 degrees clockwise
+      img.Image rotatedImage = img.copyRotate(image, angle: 0);
+
+      // Get platform-specific directory
+      Directory? appDirectory;
+      if (Platform.isAndroid) {
+        appDirectory = await getExternalStorageDirectory();
+      } else if (Platform.isIOS) {
+        appDirectory = await getApplicationDocumentsDirectory();
+      }
+
+      if (appDirectory != null) {
+        // Save the rotated image to the platform-specific directory
+        String fileName =
+            'rotated_captured_image.png'; // Change the file name as needed
+        String filePath = '${appDirectory.path}/$fileName';
+
+        rotatedFile = File(filePath);
+        await rotatedFile.writeAsBytes(img.encodePng(rotatedImage));
+      }
+    }
+
+    return rotatedFile;
+  } */
 }
