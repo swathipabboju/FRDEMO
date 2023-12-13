@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -6,6 +7,8 @@ import 'package:cgg_attendance/view/FR%20flutter/appconstants.dart';
 import 'package:cgg_attendance/view/FR%20flutter/face_matching.dart';
 import 'package:cgg_attendance/repository/faceMatchingRepository.dart';
 import 'package:cgg_attendance/res/components/alertComponent.dart';
+import 'package:cgg_attendance/view/display_images.dart';
+import 'package:face_camera/face_camera.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
@@ -19,6 +22,9 @@ class FaceMatchingViewModel with ChangeNotifier {
   Future<void> faceMatchingApiCall(BuildContext context, File file) async {
     File? localFile = await rotateLocalImageFile(Appconstants.sourceFile.path);
     File? capturedFile = await rotateCapturedImageFile(file.path);
+
+    File? croppedLocalFIle = await cropProfile(localFile);
+
     /*    try { */
     /* File downloadedFile = await urlToFile(
         "https://virtuo.cgg.gov.in/EmployeeProfileIcon/2254employeeimage20231113172753_052.png"); */
@@ -29,14 +35,22 @@ class FaceMatchingViewModel with ChangeNotifier {
     //Local face matching
 
     double faceMatchScore =
-        await FaceMatching().loadModel(file, Appconstants.sourceFile);
+        await FaceMatching().loadModel(croppedLocalFIle, capturedFile);
     print("faceMatchScore local ${faceMatchScore}");
 
-    if (faceMatchScore > 0.9) {
-      Alerts.showAlertDialog(context, "Face Matched Successfully.",
+    if (faceMatchScore > 0.8) {
+      Alerts.showAlertDialog(context, "Local Face Matched Successfully.",
           imagePath: "assets/assets_correct.png",
           Title: "Face Recognition", onpressed: () {
-        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DisplayImages(
+                localImage: croppedLocalFIle,
+                capturedImage: capturedFile ?? File(""),
+              ),
+            ));
+        //Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
       }, buttontext: "ok", buttoncolor: Colors.green);
     } else {
       // Campreefee api call
@@ -44,8 +58,10 @@ class FaceMatchingViewModel with ChangeNotifier {
       print("campreefee api call----------------");
       print("local file is $localFile");
       print("capured file is $capturedFile");
+      /* final response = await _faceMatchingRepository.FaceMatchingInfoNew(
+          localFile!, capturedFile!, context); */
       final response = await _faceMatchingRepository.FaceMatchingInfoNew(
-          localFile!, capturedFile!, context);
+          croppedLocalFIle, capturedFile!, context);
       print(
           "response in view model ${response.result?[0].faceMatches?[0].similarity}");
       if (response != "" || response != []) {
@@ -59,7 +75,15 @@ class FaceMatchingViewModel with ChangeNotifier {
             Alerts.showAlertDialog(context, "Face Matched Successfully.",
                 imagePath: "assets/assets_correct.png",
                 Title: "Face Recognition", onpressed: () {
-              Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+              //Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DisplayImages(
+                      localImage: croppedLocalFIle,
+                      capturedImage: capturedFile,
+                    ),
+                  ));
             }, buttontext: "ok", buttoncolor: Colors.green);
           } else {
             Alerts.showAlertDialog(context, "Face Not Matched.",
@@ -152,6 +176,38 @@ class FaceMatchingViewModel with ChangeNotifier {
     await compressedFile.writeAsBytes(compressedBytes);
 
     return compressedFile;
+  }
+
+  Future<File> cropProfile(File? profileImage) async {
+    final FaceDetector _faceDetector = FaceDetector(
+      options: FaceDetectorOptions(
+        enableContours: true,
+        enableLandmarks: true,
+      ),
+    );
+    final inputImage = InputImage.fromFilePath(profileImage?.path ?? "");
+    final faces = await _faceDetector.processImage(inputImage);
+    Face detectedFace = faces.first;
+    File? cropSaveFile;
+    img.Image capturedImage =
+        img.decodeImage(File(profileImage?.path ?? "").readAsBytesSync())!;
+    if (detectedFace != null && detectedFace.boundingBox != null) {
+      img.Image faceCrop = img.copyCrop(
+        capturedImage,
+        x: detectedFace.boundingBox.left.toInt() - 100,
+        y: detectedFace.boundingBox.top.toInt() - 100,
+        width: detectedFace.boundingBox.width.toInt() + 150,
+        height: detectedFace.boundingBox.height.toInt() + 150,
+      );
+      final jpg = img.encodeJpg(faceCrop);
+      cropSaveFile = File(profileImage?.path ?? "");
+      await cropSaveFile.writeAsBytes(jpg);
+      print("cropped file path ${cropSaveFile.path}");
+
+      //AppConstants.profileImage = cropSaveFile;
+      notifyListeners();
+    }
+    return cropSaveFile!;
   }
 
   Future<File?> rotateLocalImageFile(String filePath) async {

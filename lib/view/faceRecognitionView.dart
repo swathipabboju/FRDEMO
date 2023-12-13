@@ -184,15 +184,15 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
     img.Image capturedImage =
         img.decodeImage(File(_capturedImage?.path ?? "").readAsBytesSync())!;
     if (detectedFace != null && detectedFace!.boundingBox != null) {
-      /* img.Image faceCrop = img.copyCrop(
+      img.Image faceCrop = img.copyCrop(
         capturedImage,
         x: detectedFace!.boundingBox.left.toInt() - 100,
         y: detectedFace!.boundingBox.top.toInt() - 100,
         width: detectedFace!.boundingBox.width.toInt() + 150,
         height: detectedFace!.boundingBox.height.toInt() + 150,
       );
-      final jpg = img.encodeJpg(faceCrop); */
-      final jpg = img.encodeJpg(capturedImage);
+      final jpg = img.encodeJpg(faceCrop);
+      //final jpg = img.encodeJpg(capturedImage);
       cropSaveFile = File(_capturedImage?.path ?? "");
       await cropSaveFile?.writeAsBytes(jpg);
       var laplacianScore = laplacian(cropSaveFile!);
