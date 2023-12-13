@@ -236,6 +236,51 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
     img.Image capturedImage =
         img.decodeImage(File(imageFile.path).readAsBytesSync())!;
 
+    int score = 0;
+    const List<List<int>> laplace = [
+      [0, 1, 0],
+      [1, -4, 1],
+      [0, 1, 0],
+    ];
+    int size = laplace.length;
+    int height = capturedImage.height;
+    int width = capturedImage.width;
+
+    for (int x = 0; x < height - size + 1; x++) {
+      for (int y = 0; y < width - size + 1; y++) {
+        double result = 0;
+
+        for (int i = 0; i < size; i++) {
+          for (int j = 0; j < size; j++) {
+            int pixelX = x + i;
+            int pixelY = y + j;
+
+            if (pixelX < 0 ||
+                pixelX >= height ||
+                pixelY < 0 ||
+                pixelY >= width) {
+              continue;
+            }
+
+            img.Pixel pixelValue = getPixel(capturedImage, pixelX, pixelY);
+            result += pixelValue.r * laplace[i][j];
+            result += pixelValue.g * laplace[i][j];
+            result += pixelValue.b * laplace[i][j];
+          }
+        }
+
+        if (result.toInt() > LAPLACE_THRESHOLD) {
+          score++;
+        }
+      }
+    }
+    return score;
+  }
+
+  /* int laplacian(File imageFile) {
+    img.Image capturedImage =
+        img.decodeImage(File(imageFile.path).readAsBytesSync())!;
+
     // Size of the Laplacian filter
     int score = 0;
     const List<List<int>> laplace = [
@@ -284,7 +329,7 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
     }
     print("scoreeeeeeeeeeeeeeeeeeeeeeeeee ${score}");
     return score;
-  }
+  } */
 
   img.Pixel getPixel(img.Image image, int x, int y) {
     return image.getPixel(x, y);

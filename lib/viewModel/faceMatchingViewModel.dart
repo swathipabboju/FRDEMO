@@ -38,7 +38,7 @@ class FaceMatchingViewModel with ChangeNotifier {
         await FaceMatching().loadModel(croppedLocalFIle, capturedFile);
     print("faceMatchScore local ${faceMatchScore}");
 
-    if (faceMatchScore > 0.8) {
+    if (faceMatchScore > 0.85) {
       Alerts.showAlertDialog(context, "Local Face Matched Successfully.",
           imagePath: "assets/assets_correct.png",
           Title: "Face Recognition", onpressed: () {
@@ -71,7 +71,7 @@ class FaceMatchingViewModel with ChangeNotifier {
               response.result![0].faceMatches != null &&
               response.result![0].faceMatches!.isNotEmpty &&
               response.result![0].faceMatches![0].similarity != null &&
-              response.result![0].faceMatches![0].similarity! > 0.96) {
+              response.result![0].faceMatches![0].similarity! > 0.98) {
             Alerts.showAlertDialog(context, "Face Matched Successfully.",
                 imagePath: "assets/assets_correct.png",
                 Title: "Face Recognition", onpressed: () {
