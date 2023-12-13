@@ -21,6 +21,7 @@ class DisplayImages extends StatefulWidget {
 
 class _DisplayImagesState extends State<DisplayImages> {
   Uint8List? bytes;
+  Uint8List? LocalBytes;
   @override
   void initState() {
     // TODO: implement initState
@@ -30,12 +31,14 @@ class _DisplayImagesState extends State<DisplayImages> {
       bytesconvert();
       setState(() {});
     });
-    setState(() {});
+    //setState(() {});
   }
 
   bytesconvert() async {
     String base64Image = await base(widget.capturedImage);
+    String base64LocImage = await base(widget.localImage);
     bytes = base64Decode(base64Image);
+    LocalBytes = base64Decode(base64LocImage);
     setState(() {});
   }
 
@@ -59,8 +62,8 @@ class _DisplayImagesState extends State<DisplayImages> {
               height: 100,
             ),
             Text("Local image is......."),
-            Image.file(
-              widget.localImage,
+            Image.memory(
+              LocalBytes ?? Uint8List(0),
               height: 200,
               width: 200,
             ),
