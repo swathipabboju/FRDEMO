@@ -89,14 +89,30 @@ class FaceMatchingViewModel with ChangeNotifier {
             Alerts.showAlertDialog(context, "Face Not Matched.",
                 imagePath: "assets/assets_error.png",
                 Title: "Face Recognition", onpressed: () {
-              Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DisplayImages(
+                      localImage: croppedLocalFIle,
+                      capturedImage: capturedFile,
+                    ),
+                  ));
+              //Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
             }, buttontext: "ok");
           }
         } else {
           Alerts.showAlertDialog(context, response.message,
               imagePath: "assets/assets_error.png",
               Title: "Face Recognition", onpressed: () {
-            Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DisplayImages(
+                    localImage: croppedLocalFIle,
+                    capturedImage: capturedFile,
+                  ),
+                ));
+            //Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
           }, buttontext: "ok");
         }
       } else {
