@@ -79,12 +79,12 @@ class _AttendanceState extends State<Attendance> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       localImage = await getImageFile();
       setState(() {
+        print("localImage --------- $localImage");
         Appconstants.sourceFile = localImage ?? File("");
       });
-      String base64File = await fileToBase64(Appconstants.sourceFile);
-      //print("base64File $base64File");
-      print("local image is ${localImage?.path}");
-      print("Appconstants.sourceFile ${Appconstants.sourceFile.path}");
+      if (Appconstants.sourceFile.path.isNotEmpty) {
+        String base64File = await fileToBase64(Appconstants.sourceFile);
+      }
     });
   }
 
@@ -199,10 +199,11 @@ class _AttendanceState extends State<Attendance> {
       // Get the external storage directory for Android
       Directory? appDir = await getExternalStorageDirectory();
       if (appDir != null) {
-        String imagesPath = '${appDir.path}/files/profile.jpg';
-
+        String imagesPath = '${appDir.path}/profile.jpg';
+         print("imagesPath is $imagesPath");
         File imageFile = File(imagesPath);
         if (await imageFile.exists()) {
+          print("imageFile is $imageFile");
           return imageFile; // Return the image file if it exists
         }
       }

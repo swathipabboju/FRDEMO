@@ -14,7 +14,7 @@ class FaceAntiSpoofing {
   Future<double> loadModel(File? cropSaveFile) async {
     try {
       interpreter = await tflite.Interpreter.fromAsset(MODEL_FILE);
-      print("interpreter loaded ${interpreter}");
+      print("interpreter loaded for anti spoofing ${interpreter}");
       return antiSpoofing(cropSaveFile);
     } catch (e) {
       print('Error loading model: $e');

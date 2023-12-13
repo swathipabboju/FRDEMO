@@ -214,6 +214,7 @@ class FaceMatchingViewModel with ChangeNotifier {
     File? rotatedFile;
 
     // Load the image file
+    print("filee path ${filePath}");
     File imageFile = File(filePath);
     Uint8List imageBytes = await imageFile.readAsBytes();
     img.Image? image = img.decodeImage(imageBytes);

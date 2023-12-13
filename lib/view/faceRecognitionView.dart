@@ -70,7 +70,6 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
   @override
   Widget build(BuildContext context) {
     Uint8List bytes = base64Decode(base64Image);
-    print("cap img is--- $_capturedImage");
     return Scaffold(
         appBar: AppBar(
           title: const Text('FaceCamera example app'),
@@ -292,9 +291,13 @@ class _FaceRecognitionViewState extends State<FaceRecognitionView> {
   }
 
   Future<String> fileToBase64(File file) async {
-    List<int> imageBytes = await file.readAsBytes();
-    String base64Image = base64Encode(imageBytes);
-    return base64Image;
+    if (file.path != null || file.path.isNotEmpty) {
+      List<int> imageBytes = await file.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+      return base64Image;
+    } else {
+      return "";
+    }
   }
 
   Future<File> createFileFromBase64String(
