@@ -64,6 +64,21 @@ class FaceMatching {
     }
 
     return same;
+
+    /* for (int i = 0; i < 192; i++) {
+      dist +=
+          math.pow(embeddings1[i].toDouble() - embeddings2[i].toDouble(), 2);
+    }
+
+    double same = 0;
+    for (int i = 0; i < 400; i++) {
+      double threshold = 0.01 * (i + 1);
+      if (dist < threshold) {
+        same += 1.0 / 400;
+      }
+    }
+
+    return same; */
   }
 
   List<List<List<List<double>>>> _getTwoImageDatasets(
