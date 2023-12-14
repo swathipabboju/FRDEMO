@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -24,13 +23,6 @@ class FaceMatchingViewModel with ChangeNotifier {
     File? capturedFile = await rotateCapturedImageFile(file.path);
 
     File? croppedLocalFIle = await cropProfile(localFile);
-
-    /*    try { */
-    /* File downloadedFile = await urlToFile(
-        "https://virtuo.cgg.gov.in/EmployeeProfileIcon/2254employeeimage20231113172753_052.png"); */
-    //http://uat9.cgg.gov.in/virtuosuite/EmployeeProfileIcon/2251employeeimage20230724114703_610.png
-    // "https://uat9.cgg.gov.in/virtuosuite/EmployeeProfileIcon/1773employeeimage20230724112453_408.png");
-    //  "https://virtuo.cgg.gov.in/EmployeeProfileIcon/2254employeeimage20231113172753_052.png");
 
     //Local face matching
 
@@ -62,6 +54,8 @@ class FaceMatchingViewModel with ChangeNotifier {
           localFile!, capturedFile!, context); */
       final response = await _faceMatchingRepository.FaceMatchingInfoNew(
           croppedLocalFIle, capturedFile!, context);
+      print("croppedLocalFIle ${croppedLocalFIle.path}");
+      print("capturedFile ${capturedFile.path}");
       print(
           "response in view model ${response.result?[0].faceMatches?[0].similarity}");
       if (response != "" || response != []) {
