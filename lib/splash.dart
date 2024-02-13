@@ -32,12 +32,12 @@ class _SplashSCreenState extends State<SplashSCreen> {
     super.initState();
     Future.delayed(Duration(seconds: 2), () async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userLogin = await prefs.getString(SharedConstants.userName);
+      String? userLogin = await prefs.getString(SharedConstants.profilePath);
       print("userLogin:$userLogin");
 
-      if (userLogin == "") {
+      if (userLogin == null || userLogin == "") {
         Navigator.pushReplacementNamed(context, AppRoutes.registration);
-      } else if (userLogin == "true") {
+      } else if (userLogin != "" && userLogin !=  null) {
         Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
       } else {
         Navigator.pushReplacementNamed(context, AppRoutes.registration);

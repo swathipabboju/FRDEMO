@@ -8,17 +8,19 @@ import 'package:cgg_attendance/takePicture.dart';
 import 'package:cgg_attendance/takepicture_ios.dart';
 import 'package:cgg_attendance/user_registration.dart';
 import 'package:cgg_attendance/view/faceRecognitionView.dart';
+import 'package:cgg_attendance/view/registrationLive.dart';
 import 'package:flutter/material.dart';
 
 class AppPages {
   static Map<String, WidgetBuilder> get routes {
     return {
-      AppRoutes.registration: (context) => UserRegistration(),
+      AppRoutes.registration: (context) => UpdateProfileScreen(),
+      // AppRoutes.registration: (context) => UserRegistration(),
       AppRoutes.splash: (context) => SplashSCreen(),
       AppRoutes.attendance: (context) => Attendance(),
       AppRoutes.attendanceIOS: (context) => AttendanceIOS(),
       AppRoutes.dashboard: (context) => DashboardScreen(),
-      AppRoutes.FaceRecognitionView: ((context) => FaceRecognitionView()),
+      // AppRoutes.FaceRecognitionView: ((context) => FaceRecognitionView()),
 
       // AppRoutes.takecameraIOS: (context) => TakePictureScreenIOS(),
     };

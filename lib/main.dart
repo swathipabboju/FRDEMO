@@ -2,13 +2,17 @@ import 'package:camera/camera.dart';
 import 'package:cgg_attendance/routes/app_pages.dart';
 import 'package:cgg_attendance/routes/app_routes.dart';
 import 'package:cgg_attendance/takePicture.dart';
+import 'package:cgg_attendance/viewModel/attendenceViewModel.dart';
 import 'package:cgg_attendance/viewModel/faceMatchingViewModel.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await Geolocator.requestPermission();
   await FaceCamera.initialize();
   final cameras = await availableCameras();
 
@@ -38,6 +42,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => FaceMatchingViewModel(),
+        ),
+          ChangeNotifierProvider(
+          create: (context) => AttendanceViewModel(),
         ),
       ],
       child: MaterialApp(

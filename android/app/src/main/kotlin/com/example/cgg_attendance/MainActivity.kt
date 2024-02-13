@@ -28,10 +28,12 @@ class MainActivity : FlutterActivity() {
             flutterEngine!!.dartExecutor.binaryMessenger,
             "example.com/channel"
         ).setMethodCallHandler { call, result ->
-            val profile = File(getExternalFilesDir(null), "profile.jpg")
-            if (profile.exists()) {
-                val profilebitmap = BitmapFactory.decodeFile(profile.toString())
-            }
+             if (call.method == "callRegistration") {
+                call.arguments
+                navigateToCamera { resultData ->
+                    result.success(resultData)
+                }
+             }
             if (call.method == "faceRecogPunchIn") {
 
 
@@ -47,34 +49,7 @@ class MainActivity : FlutterActivity() {
                 result.notImplemented()
             }
 
-//            when (call.method) {
-//
-//                "faceRecogPunchIn" -> {
-//
-//                    navigateToVideoController { resultData ->
-//
-//                        result.success(resultData)
-//
-//                    }
-//
-//                }
-//                "faceRecogPunchIn" -> {
-//
-//                    navigateToVideoController { resultData ->
-//
-//                        result.success(resultData)
-//
-//                    }
-//
-//                }
-//
-//                else -> {
-//
-//                    result.notImplemented()
-//
-//                }
-//
-//            }
+
 
 
         }
@@ -87,7 +62,7 @@ class MainActivity : FlutterActivity() {
     private fun navigateToVideoControllerIN(completion: (result: Any) -> Unit) {
 
 
-        val intent = Intent(this@MainActivity, LockActivity::class.java)
+        val intent = Intent(this@MainActivity, FaceRecognition::class.java)
         intent.putExtra("INOUT", "IN")
 
         startActivityForResult(intent, NEXT_ACTIVITY_REQUEST_CODEIN)
@@ -98,11 +73,20 @@ class MainActivity : FlutterActivity() {
     private fun navigateToVideoControllerOUT(completion: (result: Any) -> Unit) {
 
 
-        val intent = Intent(this@MainActivity, LockActivity::class.java)
+        val intent = Intent(this@MainActivity, FaceRecognition::class.java)
         intent.putExtra("INOUT", "OUT")
 
         startActivityForResult(intent, NEXT_ACTIVITY_REQUEST_CODEIN)
 
+
+    }
+     private fun navigateToCamera(completion: (result: Any) -> Unit) {
+
+        val intent = Intent(this@MainActivity, CameraActivity::class.java)
+        intent.putExtra("camera", "IN")
+
+
+        startActivityForResult(intent, NEXT_ACTIVITY_REQUEST_CODEIN)
 
     }
 

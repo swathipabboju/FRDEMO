@@ -1,4 +1,13 @@
 <resources>
-    <string name="app_name">MJPT-PAS (MJPT – Personal Access System)</string>
+    <string name="app_name">FR Demo</string>
+
+    <string name="recognising">Recognising..</string>
+    <string name="please_place_face_within_the_circle">Please place face within the circle</string>
+    <string name="lighting">You are in lighting environment</string>
+    <string name="face_recognition">Face Recognition</string>
+    <string name="camera_dusty">Your camera is dusty or you are in light environment</string>
+    <string name="server_error">Server not responding,Please try later</string>
+    <string name="no_face_detected">No face detected</string>
+    <string name="more_than">More than one face detected</string>
 
 </resources>

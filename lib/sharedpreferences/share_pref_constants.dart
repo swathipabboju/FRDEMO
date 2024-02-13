@@ -15,4 +15,6 @@ class SharedConstants {
   static const leaveName = "leaveName";
    static const updateTime = "updateTime";
      static const userLogin = "userLogin";
+    static const punchRecords = "punchRecords";
+    static const profilePath = "profilePath";
 }

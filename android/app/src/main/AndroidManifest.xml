@@ -18,7 +18,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="MJPT-PAS">
+        android:label="FR DEMO">
         <!--            <meta-data-->
         <!--            android:name="com.google.firebase.ml.vision.DEPENDENCIES"-->
         <!--            android:value="ocr" />-->
@@ -36,12 +36,22 @@
         </provider>
 
         <activity
-            android:name=".LockActivity"
+            android:name=".FaceRecognition"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.NoActionBar">
+            
 
-        </activity>
+        </activity> 
+         <activity
+            android:name=".CameraActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Design.NoActionBar">
+            
+
+        </activity> 
+       
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

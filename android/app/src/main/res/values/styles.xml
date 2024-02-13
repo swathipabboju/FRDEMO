@@ -28,5 +28,8 @@
         <item name="android:windowEnterAnimation">@anim/exitdialog_anim1</item>
         <item name="android:windowExitAnimation">@anim/exitdialog_anim2</item>
     </style>
+      <style name="circleBackground">
+        <item name="android:background">@drawable/dialog_circle_green</item>
+    </style>
 
 </resources>
