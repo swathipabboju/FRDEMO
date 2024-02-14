@@ -38,6 +38,7 @@ class _AttendanceState extends State<Attendance> {
   MethodChannel platform = MethodChannel('example.com/channel');
   MethodChannel platformChannelIOS =
       const MethodChannel("FlutterFramework/swift_native");
+
   Position? _currentPosition;
   String _currentAddress = '';
 
@@ -429,12 +430,10 @@ class _AttendanceState extends State<Attendance> {
                       ),
                       onPressed: (((punchRecords.length) % 2 == 0))
                           ? () {
-                           
                               if (Platform.isAndroid) {
                                 _faceRecogPunchIn();
-                              
                               } else if (Platform.isIOS) {
-                                //faceRecogPunchInIOS();
+                                faceRecogPunchInIOS();
                               }
                             }
                           : () {},
@@ -466,11 +465,9 @@ class _AttendanceState extends State<Attendance> {
                       onPressed: (((punchRecords.length) % 2 != 0))
                           ? () {
                               if (Platform.isAndroid) {
-                              
                                 _faceRecogPunchOut();
-                               
                               } else if (Platform.isIOS) {
-                                // faceRecogPunchOutIOS();
+                                faceRecogPunchOutIOS();
                               }
                             }
                           : () {},

@@ -16,6 +16,20 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		C58881B2F499C6D161ABC66A /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6BB021672A1478898D19652 /* Pods_Runner.framework */; };
+		DA9B9B8E2B7CCFDD00C65161 /* Box.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9B9B8D2B7CCFDD00C65161 /* Box.m */; };
+		DA9B9B912B7CD03500C65161 /* FaceAntiSpoofing.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA9B9B902B7CD03500C65161 /* FaceAntiSpoofing.mm */; };
+		DA9B9B942B7CD0B100C65161 /* MobileFaceNet.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA9B9B932B7CD0B100C65161 /* MobileFaceNet.mm */; };
+		DA9B9B972B7CD0EB00C65161 /* MTCNN.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA9B9B962B7CD0EB00C65161 /* MTCNN.mm */; };
+		DA9B9B9D2B7CD15B00C65161 /* VideoController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9B9B9C2B7CD15B00C65161 /* VideoController.m */; };
+		DA9B9B9F2B7CD18400C65161 /* VideoBuffer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9B9B9E2B7CD18400C65161 /* VideoBuffer.storyboard */; };
+		DA9B9BA12B7CD28B00C65161 /* Tools.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9B9BA02B7CD28B00C65161 /* Tools.m */; };
+		DA9B9BA32B7CD39D00C65161 /* pnet.tflite in Resources */ = {isa = PBXBuildFile; fileRef = DA9B9BA22B7CD39D00C65161 /* pnet.tflite */; };
+		DA9B9BA52B7CD3A900C65161 /* rnet.tflite in Resources */ = {isa = PBXBuildFile; fileRef = DA9B9BA42B7CD3A900C65161 /* rnet.tflite */; };
+		DA9B9BA72B7CD3C600C65161 /* onet.tflite in Resources */ = {isa = PBXBuildFile; fileRef = DA9B9BA62B7CD3C600C65161 /* onet.tflite */; };
+		DA9B9BAB2B7CD41C00C65161 /* MobileFaceNet.tflite in Resources */ = {isa = PBXBuildFile; fileRef = DA9B9BAA2B7CD41C00C65161 /* MobileFaceNet.tflite */; };
+		DA9B9BAD2B7CD43E00C65161 /* FaceAntiSpoofing.tflite in Resources */ = {isa = PBXBuildFile; fileRef = DA9B9BAC2B7CD43E00C65161 /* FaceAntiSpoofing.tflite */; };
+		DA9B9BB12B7CDB4E00C65161 /* ProfileRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9B9BB02B7CDB4E00C65161 /* ProfileRegistration.m */; };
+		DA9B9BB32B7CDB6A00C65161 /* Registration.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9B9BB22B7CDB6A00C65161 /* Registration.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +78,27 @@
 		9DBDC910FBC30B49EBDF214E /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB719D22848DE57979FD9088 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		C6BB021672A1478898D19652 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA9B9B8C2B7CCFB900C65161 /* Box.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Box.h; sourceTree = "<group>"; };
+		DA9B9B8D2B7CCFDD00C65161 /* Box.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Box.m; sourceTree = "<group>"; };
+		DA9B9B8F2B7CCFFE00C65161 /* FaceAntiSpoofing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FaceAntiSpoofing.h; sourceTree = "<group>"; };
+		DA9B9B902B7CD03500C65161 /* FaceAntiSpoofing.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FaceAntiSpoofing.mm; sourceTree = "<group>"; };
+		DA9B9B922B7CD09100C65161 /* MobileFaceNet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MobileFaceNet.h; sourceTree = "<group>"; };
+		DA9B9B932B7CD0B100C65161 /* MobileFaceNet.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MobileFaceNet.mm; sourceTree = "<group>"; };
+		DA9B9B952B7CD0D400C65161 /* MTCNN.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTCNN.h; sourceTree = "<group>"; };
+		DA9B9B962B7CD0EB00C65161 /* MTCNN.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTCNN.mm; sourceTree = "<group>"; };
+		DA9B9B982B7CD10B00C65161 /* Tools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tools.h; sourceTree = "<group>"; };
+		DA9B9B9B2B7CD14100C65161 /* VideoController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoController.h; sourceTree = "<group>"; };
+		DA9B9B9C2B7CD15B00C65161 /* VideoController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoController.m; sourceTree = "<group>"; };
+		DA9B9B9E2B7CD18400C65161 /* VideoBuffer.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = VideoBuffer.storyboard; sourceTree = "<group>"; };
+		DA9B9BA02B7CD28B00C65161 /* Tools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tools.m; sourceTree = "<group>"; };
+		DA9B9BA22B7CD39D00C65161 /* pnet.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = pnet.tflite; sourceTree = "<group>"; };
+		DA9B9BA42B7CD3A900C65161 /* rnet.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = rnet.tflite; sourceTree = "<group>"; };
+		DA9B9BA62B7CD3C600C65161 /* onet.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = onet.tflite; sourceTree = "<group>"; };
+		DA9B9BAA2B7CD41C00C65161 /* MobileFaceNet.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = MobileFaceNet.tflite; sourceTree = "<group>"; };
+		DA9B9BAC2B7CD43E00C65161 /* FaceAntiSpoofing.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = FaceAntiSpoofing.tflite; sourceTree = "<group>"; };
+		DA9B9BAF2B7CDB2B00C65161 /* ProfileRegistration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProfileRegistration.h; sourceTree = "<group>"; };
+		DA9B9BB02B7CDB4E00C65161 /* ProfileRegistration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProfileRegistration.m; sourceTree = "<group>"; };
+		DA9B9BB22B7CDB6A00C65161 /* Registration.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Registration.storyboard; sourceTree = "<group>"; };
 		E5889C464CE2ACEC7C93E32F /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -139,6 +174,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				DA9B9B842B7CCE6B00C65161 /* FR */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -162,6 +198,90 @@
 				89C195237F621008DF65A2A2 /* Pods-RunnerTests.profile.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		DA9B9B842B7CCE6B00C65161 /* FR */ = {
+			isa = PBXGroup;
+			children = (
+				DA9B9BAE2B7CDAF000C65161 /* ProfileRegistration */,
+				DA9B9BA62B7CD3C600C65161 /* onet.tflite */,
+				DA9B9BA42B7CD3A900C65161 /* rnet.tflite */,
+				DA9B9BA22B7CD39D00C65161 /* pnet.tflite */,
+				DA9B9B8A2B7CCF3F00C65161 /* VideoCapture */,
+				DA9B9B892B7CCF2D00C65161 /* Tools */,
+				DA9B9B882B7CCF2000C65161 /* MTCNN */,
+				DA9B9B872B7CCF0800C65161 /* MobileFaceNet */,
+				DA9B9B862B7CCEC600C65161 /* FaceAntiSpoofing */,
+				DA9B9B852B7CCE9A00C65161 /* BOX */,
+			);
+			path = FR;
+			sourceTree = "<group>";
+		};
+		DA9B9B852B7CCE9A00C65161 /* BOX */ = {
+			isa = PBXGroup;
+			children = (
+				DA9B9B8C2B7CCFB900C65161 /* Box.h */,
+				DA9B9B8D2B7CCFDD00C65161 /* Box.m */,
+			);
+			path = BOX;
+			sourceTree = "<group>";
+		};
+		DA9B9B862B7CCEC600C65161 /* FaceAntiSpoofing */ = {
+			isa = PBXGroup;
+			children = (
+				DA9B9BAC2B7CD43E00C65161 /* FaceAntiSpoofing.tflite */,
+				DA9B9B8F2B7CCFFE00C65161 /* FaceAntiSpoofing.h */,
+				DA9B9B902B7CD03500C65161 /* FaceAntiSpoofing.mm */,
+			);
+			path = FaceAntiSpoofing;
+			sourceTree = "<group>";
+		};
+		DA9B9B872B7CCF0800C65161 /* MobileFaceNet */ = {
+			isa = PBXGroup;
+			children = (
+				DA9B9BAA2B7CD41C00C65161 /* MobileFaceNet.tflite */,
+				DA9B9B922B7CD09100C65161 /* MobileFaceNet.h */,
+				DA9B9B932B7CD0B100C65161 /* MobileFaceNet.mm */,
+			);
+			path = MobileFaceNet;
+			sourceTree = "<group>";
+		};
+		DA9B9B882B7CCF2000C65161 /* MTCNN */ = {
+			isa = PBXGroup;
+			children = (
+				DA9B9B952B7CD0D400C65161 /* MTCNN.h */,
+				DA9B9B962B7CD0EB00C65161 /* MTCNN.mm */,
+			);
+			path = MTCNN;
+			sourceTree = "<group>";
+		};
+		DA9B9B892B7CCF2D00C65161 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				DA9B9B982B7CD10B00C65161 /* Tools.h */,
+				DA9B9BA02B7CD28B00C65161 /* Tools.m */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		DA9B9B8A2B7CCF3F00C65161 /* VideoCapture */ = {
+			isa = PBXGroup;
+			children = (
+				DA9B9B9B2B7CD14100C65161 /* VideoController.h */,
+				DA9B9B9C2B7CD15B00C65161 /* VideoController.m */,
+				DA9B9B9E2B7CD18400C65161 /* VideoBuffer.storyboard */,
+			);
+			path = VideoCapture;
+			sourceTree = "<group>";
+		};
+		DA9B9BAE2B7CDAF000C65161 /* ProfileRegistration */ = {
+			isa = PBXGroup;
+			children = (
+				DA9B9BAF2B7CDB2B00C65161 /* ProfileRegistration.h */,
+				DA9B9BB02B7CDB4E00C65161 /* ProfileRegistration.m */,
+				DA9B9BB22B7CDB6A00C65161 /* Registration.storyboard */,
+			);
+			path = ProfileRegistration;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -260,10 +380,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA9B9BA32B7CD39D00C65161 /* pnet.tflite in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
+				DA9B9BB32B7CDB6A00C65161 /* Registration.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
+				DA9B9BAD2B7CD43E00C65161 /* FaceAntiSpoofing.tflite in Resources */,
+				DA9B9BA52B7CD3A900C65161 /* rnet.tflite in Resources */,
+				DA9B9BAB2B7CD41C00C65161 /* MobileFaceNet.tflite in Resources */,
+				DA9B9B9F2B7CD18400C65161 /* VideoBuffer.storyboard in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				DA9B9BA72B7CD3C600C65161 /* onet.tflite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,8 +521,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA9B9B972B7CD0EB00C65161 /* MTCNN.mm in Sources */,
+				DA9B9B8E2B7CCFDD00C65161 /* Box.m in Sources */,
+				DA9B9B942B7CD0B100C65161 /* MobileFaceNet.mm in Sources */,
+				DA9B9BA12B7CD28B00C65161 /* Tools.m in Sources */,
+				DA9B9B912B7CD03500C65161 /* FaceAntiSpoofing.mm in Sources */,
+				DA9B9BB12B7CDB4E00C65161 /* ProfileRegistration.m in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				DA9B9B9D2B7CD15B00C65161 /* VideoController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,7 +604,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
@@ -598,7 +732,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -647,7 +781,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;

@@ -26,6 +26,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Attendace  requires camera access to take pictures of your files to get the information</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Attendace would like to use your current location to identify your office location</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Attendace would like to use your current location to identify your office location</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -47,6 +51,8 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Attendace  requires camera access to take pictures of your files to get the information</string>
+	<key>NSLocationUsageDescription</key>
+	<string>app requires user location </string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>

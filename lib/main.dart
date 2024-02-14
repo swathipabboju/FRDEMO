@@ -11,13 +11,13 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await Geolocator.requestPermission();
   await FaceCamera.initialize();
   final cameras = await availableCameras();
 
   // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras[1];
+  // final firstCamera = cameras[1];
 
   // Obtain a list of the available cameras on the device.
 // runApp(
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => FaceMatchingViewModel(),
         ),
-          ChangeNotifierProvider(
+        ChangeNotifierProvider(
           create: (context) => AttendanceViewModel(),
         ),
       ],

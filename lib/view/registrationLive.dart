@@ -189,7 +189,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   CupertinoDialogAction(
                     child: const Text('Yes'),
                     onPressed: () {
-                      SystemNavigator.pop();
+                      if (Platform.isAndroid) {
+                        SystemNavigator.pop();
+                      } else if (Platform.isIOS) {
+                        exit(1);
+                      }
                     },
                   ),
                   CupertinoDialogAction(
