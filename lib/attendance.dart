@@ -167,6 +167,7 @@ class _AttendanceState extends State<Attendance> {
     dynamic result,
     BuildContext context,
   ) async {
+    String punchResult = '';
     print("Received result from iOS: $result");
 // Assuming result is a Map
     if (result is Map) {
@@ -180,7 +181,41 @@ class _AttendanceState extends State<Attendance> {
       // Save the status to a class variable if needed
       String attendancestatus = status;
       String frResult = fr;
+
+      print("punch result in Ios: $attendancestatus");
       if (attendancestatus == "punchIn" && frResult == "face Matched") {
+        //attendanceProvider.setIsLoadingStatus(true);
+        setState(() {
+          resultvalue = attendancestatus;
+        });
+        punchResult = "Punch in Successful";
+      } else if (attendancestatus == "punchOut" && frResult == "face Matched") {
+        setState(() {
+          resultvalue = attendancestatus;
+        });
+        punchResult = "Punch out Successful";
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+      }
+
+      /*   showCupertinoDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoAlertDialog(
+              title: Text('Attendance'),
+              content: Text('${punchResult}'),
+              actions: [
+                CupertinoDialogAction(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                        context, AppRoutes.dashboard); // Close the alert
+                  },
+                ),
+              ],
+            );
+          }); */
+      /* if (attendancestatus == "punchIn" && frResult == "face Matched") {
         showCupertinoDialog(
             context: context,
             builder: (BuildContext context) {
@@ -191,15 +226,20 @@ class _AttendanceState extends State<Attendance> {
                   CupertinoDialogAction(
                     child: Text('OK'),
                     onPressed: () {
-                      Navigator.pushNamed(
-                          context, AppRoutes.registration); // Close the alert
+                      Navigator.pushReplacementNamed(
+                          context, AppRoutes.dashboard); // Close the alert
                     },
                   ),
                 ],
               );
             });
+        punchRecords.add(PunchRecord('Punch In',
+            DateFormat("hh:mm:ss a").format(DateTime.now()), _currentAddress));
+        _savePunchRecords();
         //  else if (attendancestatus == "punchOut" && frResult == "face Matched") {
-      }
+      } */
+    } else {
+      punchResult = '';
     }
   }
 
@@ -268,15 +308,32 @@ class _AttendanceState extends State<Attendance> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AttendanceViewModel>(context);
-    platform.setMethodCallHandler((call) async {
-      switch (call.method) {
-        case 'onResultFromAndroidIN':
-          _handleResultFromAndroidIn(call.arguments, context, provider);
-          break;
 
-        // ... other cases ...q
-      }
-    });
+    if (Platform.isAndroid) {
+      platform.setMethodCallHandler((call) async {
+        switch (call.method) {
+          case 'onResultFromAndroidIN':
+            _handleResultFromAndroidIn(call.arguments, context, provider);
+            print("call.arguments${call.arguments}");
+
+            break;
+        }
+      });
+    } else if (Platform.isIOS) {
+      platformChannelIOS.setMethodCallHandler((call) async {
+        switch (call.method) {
+          case 'onResultFromPunchIniOS':
+            // print("punch in result");
+            _handlePunchResultFromiOS(call.arguments, context);
+            break;
+          case 'onResultFromPunchOutiOS':
+            // print("punch out result");
+            _handlePunchResultFromiOS(call.arguments, context);
+            break;
+        }
+      });
+    }
+
     punchRecords.forEach((element) {
       print("punchRecords ${element.type} ${element.timestamp}");
       print("length ${punchRecords.length % 2}");

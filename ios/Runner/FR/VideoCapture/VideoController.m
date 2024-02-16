@@ -38,6 +38,10 @@
 @property (nonatomic, strong) NSDictionary *resultDataOUT;
 @property (nonatomic, strong) NSDictionary *resultDataFORGOTPUNCHOUT;
 @property (nonatomic, strong) NSData *profileImageData;
+@property (assign, nonatomic) BOOL isSpoofingAlertPresent;
+@property (assign, nonatomic) BOOL isMoreThanOnefaceAlertPresent;
+
+
 
 @end
 
@@ -47,6 +51,7 @@
     [super viewDidLoad];
     _type = 1;
     self.isAlertPresented = NO;
+    self.isSpoofingAlertPresent = NO;
     self.loadImage;
     //    NSLog(@"Image path IOS: %@", _filePath);
     
@@ -60,7 +65,7 @@
     //        if (error) {
     //            NSLog(@"Error fetching image: %@", error);
     //            return;
-    //        }
+    //        }ƒ
     //
     //        if (data) {
     //            UIImage *image = [UIImage imageWithData:data];
@@ -261,6 +266,8 @@
     // Save a string in NSUserDefaults
     if (laplace == 0){
         dispatch_async(dispatch_get_main_queue(), ^{
+                        if (!self.isSpoofingAlertPresent) {
+                            self.isSpoofingAlertPresent = YES;
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"FR Attedance"
                                                                                      message:@"Spoofing detected Please try again"
                                                                               preferredStyle:UIAlertControllerStyleAlert];
@@ -271,40 +278,43 @@
                 // Handle OK action here
                 // NSLog(@"OK button tapped");
                 //  [self performOKAction]; // Call your custom method here
-                    if (self.PunchInresultHandler) {
-                        self->_resultDataIN= @{
+                if (self.PunchInresultHandler) {
+                    self->_resultDataIN= @{
+                        @"result": @"Spoofing detected",
+                        @"status" : @"punchIn"
+                    };
+                    self.PunchInresultHandler(self.resultDataIN);
+                    [self.session stopRunning];
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                }
+                if (self.PunchOutresultHandler) {
+                    if (self.resultDataOUT != nil) {
+                        self->_resultDataOUT= @{
                             @"result": @"Spoofing detected",
-                            @"status" : @"punchIn"
+                            @"status" : @"punchOut"
                         };
-                        self.PunchInresultHandler(self.resultDataIN);
-                        [self.session stopRunning];
-                        [self dismissViewControllerAnimated:YES completion:nil];
                     }
-                    if (self.PunchOutresultHandler) {
-                        if (self.resultDataOUT != nil) {
-                            self->_resultDataOUT= @{
-                                @"result": @"Spoofing face detected",
-                                @"status" : @"punchOut"
-                            };
-                        }
-                        self.PunchOutresultHandler(self.resultDataOUT);
-                        [self.session stopRunning];
-                        [self dismissViewControllerAnimated:YES completion:nil];
-                    }
-                    if (self.ForgotPunchOutresultHandler) {
-                        self->_resultDataFORGOTPUNCHOUT= @{
-                            @"result": @"Spoofing face detected",
-                            @"status" : @"forgotPunchOut"
-                        };
-                        self.ForgotPunchOutresultHandler(self.resultDataFORGOTPUNCHOUT);
-                        [self.session stopRunning];
-                        [self dismissViewControllerAnimated:YES completion:nil];
-                    }
-               
+                    self.PunchOutresultHandler(self.resultDataOUT);
+                    [self.session stopRunning];
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                }
+                if (self.ForgotPunchOutresultHandler) {
+                    self->_resultDataFORGOTPUNCHOUT= @{
+                        @"result": @"Spoofing detected",
+                        @"status" : @"forgotPunchOut"
+                    };
+                    self.ForgotPunchOutresultHandler(self.resultDataFORGOTPUNCHOUT);
+                    [self.session stopRunning];
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                }
+                
             }];
+            
             [alertController addAction:okAction];
             [self presentViewController:alertController animated:YES completion:nil];
+        }
         });
+        
     }
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setInteger:laplace forKey:@"imageLightning"];
@@ -330,10 +340,10 @@
     //  if (type == 2) {
  // //  compare = [self.mfn compare:self.inputImage with:cropImage];
   //  NSLog(@"compare",compare);
-    if (type == 1){
+    // if (type == 1){
         // NSLog(@"_registredProfilePhoto: %@",_registredProfilePhoto);
         [self sendFormDataWithImages:_finalImage image2 :_registredProfilePhoto ];
-    }
+    // }
 }
 
 
@@ -487,6 +497,9 @@
        //     results  @"2 elements"
             if (size > 1){
                 dispatch_async(dispatch_get_main_queue(), ^{
+                                        if (!self.isMoreThanOnefaceAlertPresent) {
+                                            self.isMoreThanOnefaceAlertPresent = YES;
+                    
                     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"FR Attedance"
                                                                                              message:@"More than one face detected Please try again"
                                                                                       preferredStyle:UIAlertControllerStyleAlert];
@@ -497,24 +510,27 @@
                         // Handle OK action here
                         // NSLog(@"OK button tapped");
                         //  [self performOKAction]; // Call your custom method here
+                        _isHandling = YES;
                         [self dismissViewControllerAnimated:YES completion:^{
                             if (self.PunchInresultHandler) {
                                 self->_resultDataIN= @{
                                     @"result": @"More than one face detected",
                                     @"status" : @"punchIn"
                                 };
-                                self.PunchInresultHandler(self.resultDataIN);
                                 [self.session stopRunning];
                                 [self dismissViewControllerAnimated:YES completion:nil];
+                                self.PunchInresultHandler(self.resultDataIN);
+                               
                             }
                             if (self.PunchOutresultHandler) {
                                 self->_resultDataOUT= @{
                                     @"result": @"More than one face detected",
                                     @"status" : @"punchOut"
                                 };
-                                self.PunchOutresultHandler(self.resultDataOUT);
                                 [self.session stopRunning];
                                 [self dismissViewControllerAnimated:YES completion:nil];
+                                self.PunchOutresultHandler(self.resultDataOUT);
+                            
                             }
                             if (self.ForgotPunchOutresultHandler) {
                                 self->_resultDataFORGOTPUNCHOUT= @{
@@ -529,6 +545,7 @@
                     }];
                     [alertController addAction:okAction];
                     [self presentViewController:alertController animated:YES completion:nil];
+                }
                 });
             } else {
                 [self face:image type:self.type];

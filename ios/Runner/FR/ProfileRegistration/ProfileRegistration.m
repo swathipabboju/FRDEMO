@@ -1,33 +1,31 @@
-
-
 //  Runner
 //
 //  Created by CGG on 29/11/23.
 //
-
+ 
 #import <Foundation/Foundation.h>
 #import "ProfileRegistration.h"
 #import <AVFoundation/AVFoundation.h>
 #import "Tools.h"
 #import "FaceAntiSpoofing.h"
 #import "MobileFaceNet.h"
-
+ 
 @interface ProfileRegistration () <AVCaptureVideoDataOutputSampleBufferDelegate , AVCapturePhotoCaptureDelegate>
-
+ 
 @property (weak, nonatomic) IBOutlet UIView *preview;
 @property (weak, nonatomic) IBOutlet UILabel *resultLabel;
 @property (strong, nonatomic) IBOutlet UILabel *noteLabel;
-
+ 
 @property (strong, nonatomic) AVCaptureSession *session;
 @property (strong, nonatomic) AVCaptureDeviceInput *input;
 @property (strong, nonatomic) AVCaptureVideoDataOutput *output;
 @property (strong, nonatomic) AVCaptureVideoPreviewLayer *layer;
-
+ 
 @property (assign, nonatomic) BOOL isHandling;
 @property (assign, nonatomic) NSInteger frameNum;
 @property (assign, nonatomic) int time;
 @property (assign, nonatomic) int laplaceValue;
-
+ 
 @property (assign, nonatomic) int boxesCount;
 @property (assign, nonatomic) UIImage* finalImage;
 @property (strong, nonatomic) UIImage *inputImage;
@@ -38,10 +36,12 @@
 @property (nonatomic, strong) NSDictionary *profileImageResult;
 @property (strong, nonatomic) AVCapturePhotoOutput *photoOutput;
 @property (strong, nonatomic) VNDetectFaceRectanglesRequest *faceDetectionRequest;
-
+@property (nonatomic, strong) NSMutableArray<NSNumber *> *booleanList;
+@property (assign, nonatomic) BOOL isEyeBlinkalertPresented;
+ 
 @end
-
-
+ 
+ 
 @implementation ProfileRegistration
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -122,13 +122,13 @@
         }
         // Inside your ProfileRegistration class
         UIButton *captureButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        captureButton.tintColor = [UIColor redColor];
+        captureButton.tintColor = [UIColor blackColor];
         [captureButton setImage:[UIImage imageNamed:@"camera"] forState:UIControlStateNormal];
         [captureButton addTarget:self action:@selector(captureButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         // Adjust the frame and other properties as needed
         captureButton.frame = CGRectMake(CGRectGetWidth(self.view.frame) - 100, CGRectGetHeight(self.view.frame) - 100, 50, 50);
         [self.preview addSubview:captureButton];
-
+ 
     });
 }
 - (void)captureButtonTapped {
@@ -140,12 +140,12 @@
         AVCapturePhotoSettings *photoSettings = [AVCapturePhotoSettings photoSettings];
         [self.photoOutput capturePhotoWithSettings:photoSettings delegate:self];
 }
-
+ 
 - (BOOL)checkFaceDetectionConditions {
     BOOL faceDetected = [self faceBeforeCameraClick:_currentFrameImage type:self.type];
     return faceDetected;
 }
-
+ 
 - (void)captureOutput:(AVCapturePhotoOutput *)output didFinishProcessingPhoto:(AVCapturePhoto *)photo error:(nullable NSError *)error {
     if (!error) {
         NSData *imageData = photo.fileDataRepresentation;
@@ -155,12 +155,12 @@
         [self handleCapturedImage:capturedImage];
     }
 }
-
+ 
 - (void)captureOutput:(AVCapturePhotoOutput *)output didFinishCaptureForResolvedSettings:(AVCaptureResolvedPhotoSettings *)resolvedSettings error:(nullable NSError *)error {
     // Handle the completion of the capture process if needed
    
 }
-
+ 
 - (void)handleCapturedImage:(UIImage *)capturedImage {
     // Add your logic to handle the captured image
     // For example, you can display it in an image view
@@ -183,7 +183,7 @@
     NSString *base64String = [imageData base64EncodedStringWithOptions:0];
     return base64String;
 }
-
+ 
 - (IBAction)close:(id)sender {
     [self.session stopRunning];
     [self dismissViewControllerAnimated:YES completion:^{
@@ -221,7 +221,7 @@
     
     return image;
 }
-
+ 
 - (void)face:(UIImage *)image type:(int)type {
     CGImageRef imageRef = image.CGImage;
     size_t width = CGImageGetWidth(imageRef);
@@ -289,7 +289,7 @@
     // fas_threshold  = 0.2f
     NSLog(@"%d@score", score);
     
-    if (score > fas_threshold  && score > 0.00) {
+    if (score > fas_threshold ) {
        // [self setText:laplace score:score];
         [self setTextSpoofing:laplace score:score];
         self.isHandling = NO;
@@ -401,7 +401,7 @@
         // If the method reaches this point, it means face detection conditions are met
         return YES;
     }
-
+ 
 - (void)setText:(int)boxesCount score:(float)score {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (boxesCount == 0) {
@@ -501,7 +501,7 @@
     //    NSLog(@"typre: %i",self.type);
    // NSLog(@"frameNum : %ld",(long)self.frameNum);
    _currentFrameImage = [self convertSampleBufferToImage:sampleBuffer];
-
+ 
     
     // Perform face detection
        
@@ -551,37 +551,107 @@
                         [alertController addAction:okAction];
                         [self presentViewController:alertController animated:YES completion:nil];
                     });
-                }  else {
+                }  else if(size > 1){
+                    
+                        CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+                        if (pixelBuffer) {
+                            CIImage *faceImage = [CIImage imageWithCVImageBuffer:pixelBuffer];
+                            
+                            // Configure face detection options
+                            NSDictionary *accuracy = @{CIDetectorAccuracy: CIDetectorAccuracyHigh};
+                            CIDetector *faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:accuracy];
+                            
+                            // Detect faces in the image
+                            NSArray<CIFeature *> *faces = [faceDetector featuresInImage:faceImage options:@{CIDetectorSmile: @YES, CIDetectorEyeBlink: @YES}];
+                            for (CIFeature *face in faces) {
+                                
+                                if ([face isKindOfClass:[CIFaceFeature class]]) {
+                                    CIFaceFeature *faceFeature = (CIFaceFeature *)face;
+                                    
+                                    // Determine if both eyes are closed (blinking)
+                                    BOOL blinking = faceFeature.leftEyeClosed && faceFeature.rightEyeClosed;
+                                    NSLog(@"blinking: %d", blinking);
+                                    
+                                    [_booleanList addObject:@(blinking)];
+                                    
+                                    
+                                }
+                                NSLog(@"Boolean value: %@", _booleanList );
+                                BOOL containsZero = [_booleanList containsObject:@(0)];
+                                BOOL containsOne = [_booleanList containsObject:@(1)];
+                                
+                                if (containsZero && containsOne && _movements > 11 && _movements > 0) {
+                                    NSLog(@"_booleanList contains both 0 and 1");
+                                    [self face:image type:self.type];
+                                    _isHandling = YES;
+                                    
+                                } else {
+                                    _movements++;
+                                    NSLog(@"_booleanList does not contain both 0 and 1");
+                                    if (_movements > 100){
+                                        [self presentAlertWithEyeBlinkMessage:@"Please make eye moments."];
+                                    }
+                                }
+                            }
+                        }
+                        _isHandling = NO;
+                    
+                }else {
                 //    [self detectFaceInImage:image];
                     [self face:image type:self.type];
                     return;
                 }
                
-
+ 
             }
         [self face:image type:self.type];
         }
     self.frameNum++;
 }
+- (void)presentAlertWithEyeBlinkMessage:(NSString *)message {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!self.isEyeBlinkalertPresented) {
+            self.isEyeBlinkalertPresented = YES;
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"MJP PASS"
+                                                                                     message:message
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+//                self->_profileImageResult = @{
+//                    @"result": @"",
+//                    @"status" : @"Please make eye moments."
+//                };
+//                self.ProfileRegistrationHandler(self.profileImageResult);
+                [self.session stopRunning];
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+            [alertController addAction:okAction];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+    });
+  
+}
 - (void)detectFaceInImage:(UIImage *)image {
     // Create a request handler
     VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:image.CGImage options:@{}];
-
+ 
     // Perform face detection
     NSError *error;
     [handler performRequests:@[self.faceDetectionRequest] error:&error];
-
+ 
     if (error) {
         NSLog(@"Error in face detection: %@", error.localizedDescription);
         return;
     }
-
+ 
     // Retrieve the face observations
     NSArray<VNFaceObservation *> *faceObservations = self.faceDetectionRequest.results;
-
+ 
     // Call your extractFace method with the detected face observations
     BOOL wellPositioned = [self extractFace:faceObservations];
-
+ 
     if (wellPositioned) {
         // Perform additional actions when faces are well positioned
         NSLog(@"Faces are well positioned");
@@ -590,35 +660,35 @@
         NSLog(@"Faces are not well positioned");
     }
 }
-
+ 
 - (BOOL)extractFace:(NSArray<VNFaceObservation *> *)faces {
     BOOL wellPositioned = faces.count > 0;
-
+ 
     for (VNFaceObservation *face in faces) {
         // Get the bounding box of the detected face
         CGRect faceBoundingBox = face.boundingBox;
-
+ 
         // Extract left and right position values
         CGFloat faceLeft = faceBoundingBox.origin.x;
         CGFloat faceRight = faceBoundingBox.origin.x + faceBoundingBox.size.width;
         NSLog(@"faceLeft: %f", faceLeft);
         NSLog(@"faceRight: %f", faceRight);
         // Do something with faceLeft and faceRight...
-
+ 
         // Perform your face extraction logic here based on the bounding box
         // You can integrate your existing face extraction logic from the extractFace method here
         // ...
-
+ 
         // Example: Check if the face is well positioned based on your existing conditions
 //        if (faceLeft > thresholdX || faceRight < thresholdY) {
 //            wellPositioned = NO;
 //            break;
 //        }
     }
-
+ 
     return wellPositioned;
 }
-
+ 
 - (void)performOKAction {
     [self dismissViewControllerAnimated:YES completion:^{
     }];
@@ -635,6 +705,6 @@
     
     return fixedImage;
 }
-
-
+ 
+ 
 @end

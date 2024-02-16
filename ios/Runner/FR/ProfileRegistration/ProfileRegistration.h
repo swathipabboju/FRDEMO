@@ -25,7 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
  
 @interface ProfileRegistration : UIViewController
- 
+
 @property (assign, nonatomic) int type;
 @property (strong, nonatomic) MobileFaceNet *mfn;
 @property (strong, nonatomic) FaceAntiSpoofing *fas;
@@ -41,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) NSString *empId;
 @property (assign, nonatomic) NSString *empName;
 @property (nonatomic, copy) void (^ProfileRegistrationHandler)(NSDictionary *resultDataProfile);
+@property (assign, nonatomic) int movements;
 
  
  

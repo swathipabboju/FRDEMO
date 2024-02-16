@@ -37,7 +37,7 @@ class _SplashSCreenState extends State<SplashSCreen> {
 
       if (userLogin == null || userLogin == "") {
         Navigator.pushReplacementNamed(context, AppRoutes.registration);
-      } else if (userLogin != "" && userLogin != "null") {
+      } else if (userLogin != "" && userLogin != null) {
         Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
       } else {
         Navigator.pushReplacementNamed(context, AppRoutes.registration);

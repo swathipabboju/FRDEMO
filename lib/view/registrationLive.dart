@@ -339,7 +339,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                           await SharedPreferences.getInstance();
                                       prefs.setString(
                                           SharedConstants.profilePath,
-                                          savedProfilePath!);
+                                          savedProfilePath ?? "");
                                       showDialog(
                                           barrierDismissible: false,
                                           context: context,
@@ -438,7 +438,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   Future<String?> saveImageToDocumentsDirectoryIOS(Uint8List bytes) async {
     try {
       String dir = (await getApplicationDocumentsDirectory()).path;
-      String fullPath = '$dir/images/profileregister.jpg';
+      String subDir = '$dir/images';
+      String fullPath = '$subDir/profile.jpg';
+
+      // Ensure the subdirectory exists
+      Directory(subDir).createSync(recursive: true);
+
+      //String fullPath = '$dir/images/profileregister.jpg';
       print("local file full path ${fullPath}");
       File file = File(fullPath);
       await file.writeAsBytes(bytes);
