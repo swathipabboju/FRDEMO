@@ -286,7 +286,6 @@ class _AttendanceState extends State<Attendance> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      punchRecords.clear();
       localImage = await getImageFile();
       setState(() {
         print("localImage --------- $localImage");
