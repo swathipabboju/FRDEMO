@@ -1,10 +1,8 @@
-
-
 //
 //  VideoController.m
 //  Runner
 //
-//  Created by CGG on 29/11/23.
+//  Created by CGG on 05/02/24.
 //
 
 #import <Foundation/Foundation.h>
@@ -15,17 +13,15 @@
 #import "MobileFaceNet.h"
 
 @interface VideoController () <AVCaptureVideoDataOutputSampleBufferDelegate>
-
 @property (weak, nonatomic) IBOutlet UIView *preview;
 @property (weak, nonatomic) IBOutlet UILabel *resultLabel;
 @property (strong, nonatomic) IBOutlet UILabel *noteLabel;
-
 @property (strong, nonatomic) AVCaptureSession *session;
 @property (strong, nonatomic) AVCaptureDeviceInput *input;
 @property (strong, nonatomic) AVCaptureVideoDataOutput *output;
 @property (strong, nonatomic) AVCaptureVideoPreviewLayer *layer;
-
 @property (assign, nonatomic) BOOL isHandling;
+@property (assign, nonatomic) BOOL spoofngDetected;
 @property (assign, nonatomic) NSInteger frameNum;
 @property (assign, nonatomic) int time;
 @property (assign, nonatomic) int boxesCount;
@@ -38,10 +34,6 @@
 @property (nonatomic, strong) NSDictionary *resultDataOUT;
 @property (nonatomic, strong) NSDictionary *resultDataFORGOTPUNCHOUT;
 @property (nonatomic, strong) NSData *profileImageData;
-@property (assign, nonatomic) BOOL isSpoofingAlertPresent;
-@property (assign, nonatomic) BOOL isMoreThanOnefaceAlertPresent;
-@property (assign, nonatomic) BOOL isEyeBlinkalertPresented;
-
 
 
 
@@ -51,12 +43,13 @@
 @implementation VideoController
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if (self) {
-                _booleanList = [NSMutableArray array]; // Initialize the boolean list
-            }
     _type = 1;
+    if (self) {
+            _booleanList = [NSMutableArray array]; // Initialize the boolean list
+        }
     self.isAlertPresented = NO;
-    self.isSpoofingAlertPresent = NO;
+    self.isSpoofingalertPresented = NO;
+    self.spoofngDetected = NO;
     self.loadImage;
     //    NSLog(@"Image path IOS: %@", _filePath);
     
@@ -70,7 +63,7 @@
     //        if (error) {
     //            NSLog(@"Error fetching image: %@", error);
     //            return;
-    //        }ƒ
+    //        }
     //
     //        if (data) {
     //            UIImage *image = [UIImage imageWithData:data];
@@ -246,7 +239,7 @@
     NSArray<Box *> *boxes = [self.mtcnn detectFaces:image minFaceSize:(int)width / 5];
     if (boxes.count == 0) {
       [self setText:_boxesCount score:0];
-        _boxesCount = 0;
+      //  _boxesCount = 0;
         self.isHandling = NO;
         return;
     }
@@ -262,17 +255,17 @@
     UIImage *cropImage = [Tools cropImage:image toRect:box.transform2Rect];
     _finalImage = cropImage;
     
-    //  NSLog(@"_finalImage: %@", _finalImage);
+      NSLog(@"_finalImage: %@", _finalImage);
     //  NSLog(@"_registredProfilePhoto: %@", _registredProfilePhoto);
     self.time++;
     
     int laplace = [self.fas laplacian:cropImage];
     
+    
     // Save a string in NSUserDefaults
     if (laplace == 0){
         dispatch_async(dispatch_get_main_queue(), ^{
-                        if (!self.isSpoofingAlertPresent) {
-                            self.isSpoofingAlertPresent = YES;
+            self.spoofngDetected = YES;
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"FR Attedance"
                                                                                      message:@"Spoofing detected Please try again"
                                                                               preferredStyle:UIAlertControllerStyleAlert];
@@ -283,130 +276,131 @@
                 // Handle OK action here
                 // NSLog(@"OK button tapped");
                 //  [self performOKAction]; // Call your custom method here
-                if (self.PunchInresultHandler) {
-                    self->_resultDataIN= @{
-                        @"result": @"Spoofing detected",
-                        @"status" : @"punchIn"
-                    };
-                    self.PunchInresultHandler(self.resultDataIN);
-                    [self.session stopRunning];
-                    [self dismissViewControllerAnimated:YES completion:nil];
-                }
-                if (self.PunchOutresultHandler) {
-                    if (self.resultDataOUT != nil) {
-                        self->_resultDataOUT= @{
+                    if (self.PunchInresultHandler) {
+                        self->_resultDataIN= @{
                             @"result": @"Spoofing detected",
-                            @"status" : @"punchOut"
+                            @"status" : @"punchIn"
                         };
+                        self.PunchInresultHandler(self.resultDataIN);
+                        [self.session stopRunning];
+                        [self dismissViewControllerAnimated:YES completion:nil];
                     }
-                    self.PunchOutresultHandler(self.resultDataOUT);
-                    [self.session stopRunning];
-                    [self dismissViewControllerAnimated:YES completion:nil];
-                }
-                if (self.ForgotPunchOutresultHandler) {
-                    self->_resultDataFORGOTPUNCHOUT= @{
-                        @"result": @"Spoofing detected",
-                        @"status" : @"forgotPunchOut"
-                    };
-                    self.ForgotPunchOutresultHandler(self.resultDataFORGOTPUNCHOUT);
-                    [self.session stopRunning];
-                    [self dismissViewControllerAnimated:YES completion:nil];
-                }
-                
+                    if (self.PunchOutresultHandler) {
+                     //   if (self.resultDataOUT != nil) {
+                            self->_resultDataOUT= @{
+                                @"result": @"Spoofing detected",
+                                @"status" : @"punchOut"
+                            };
+                    //    }
+                        self.PunchOutresultHandler(self.resultDataOUT);
+                        [self.session stopRunning];
+                        [self dismissViewControllerAnimated:YES completion:nil];
+                    }
+                   
+               
             }];
-            
             [alertController addAction:okAction];
             [self presentViewController:alertController animated:YES completion:nil];
-        }
         });
-        
     }
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setInteger:laplace forKey:@"imageLightning"];
+    NSLog(@"%d@slaplace val is", laplace);
     if (laplace < laplacian_threshold) {
-        [self setText:laplace score:0];
+       // [self setTextSpoofing:laplace score:0];
+        self.isHandling = NO;
+        return;
+    }
+    
+   
+    float score = [self.fas antiSpoofing:cropImage];
+    NSLog(@"%f@score ", score);
+    [userDefaults setFloat:score forKey:@"spoofing"];
+   // fas_threshold  = 0.2f
+ //   0.0041 > 0.1f photo print
+ //   0.0123 > 0.1f real face
+ //   0.0009
+  //  0.00 > 0.00
+    if (score > fas_threshold) {
+        [self setTextSpoofing:laplace score:score];
+     //   [self setText:laplace score:score];
+        _finalImage = nil;
         self.isHandling = NO;
         return;
     }
    
-    float score = [self.fas antiSpoofing:cropImage];
     
-    [userDefaults setFloat:score forKey:@"spoofing"];
-   // fas_threshold  = 0.2f
-    if (score > fas_threshold) {
-        [self setText:laplace score:score];
-        self.isHandling = NO;
-        return;
-    }
-    NSLog(@"%d@slaplace val is", laplace);
    
     float compare = 0;
     
     //  if (type == 2) {
  // //  compare = [self.mfn compare:self.inputImage with:cropImage];
   //  NSLog(@"compare",compare);
-    // if (type == 1){
-        // NSLog(@"_registredProfilePhoto: %@",_registredProfilePhoto);
+    if (type == 1){
+         NSLog(@"_finalImage: %@",_finalImage);
+        if(!self.spoofngDetected)
         [self sendFormDataWithImages:_finalImage image2 :_registredProfilePhoto ];
-    // }
+    }
 }
 
 
-//- (void)face:(UIImage *)image type:(int)type {
-//    CGImageRef imageRef = image.CGImage;
-//    size_t width = CGImageGetWidth(imageRef);
-//    size_t height = CGImageGetHeight(imageRef);
-//    NSArray<Box *> *boxes = [self.mtcnn detectFaces:image minFaceSize:(int)width / 5];
-//    if (boxes.count == 0) {
-//        [self setText:-1 score:0];
-//        self.isHandling = NO;
-//        return;
-//    }
-//
-//    Box *box = boxes[0];
-//    [box toSquareShape];
-//    if ([box transboundW:(int)width H:(int)height]) {
-//        [self setText:-1 score:0];
-//        self.isHandling = NO;
-//        return;
-//    }
-//    //crop live image
-//    UIImage *cropImage = [Tools cropImage:image toRect:box.transform2Rect];
-//    _finalImage = cropImage;
-//
-//    //  NSLog(@"_finalImage: %@", _finalImage);
-//    //  NSLog(@"_registredProfilePhoto: %@", _registredProfilePhoto);
-//    self.time++;
-//
-//    int laplace = [self.fas laplacian:cropImage];
-//    // Save a string in NSUserDefaults
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    [userDefaults setInteger:laplace forKey:@"imageLightning"];
-//    if (laplace < laplacian_threshold) {
-//        [self setText:laplace score:0];
-//        self.isHandling = NO;
-//        return;
-//    }
-//    float score = [self.fas antiSpoofing:cropImage];
-//    [userDefaults setFloat:score forKey:@"spoofing"];
-//    if (score > fas_threshold) {
-//        [self setText:laplace score:score];
-//        self.isHandling = NO;
-//        return;
-//    }
-//    float compare = 0;
-//
-//    //  if (type == 2) {
-//    compare = [self.mfn compare:self.inputImage with:cropImage];
-//    NSLog(@"compare",compare);
-//
-//    NSLog(@"Result Data ios xcode111111: %@", self.resultDataOUT);
-//    if (type == 1){
-//        // NSLog(@"_registredProfilePhoto: %@",_registredProfilePhoto);
-//        [self sendFormDataWithImages:_finalImage image2 :_registredProfilePhoto ];
-//    }
-//}
 
+- (void)setTextSpoofing:(int)laplace score:(float)score {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.spoofngDetected = YES;
+            if (!self.isSpoofingalertPresented) {
+                self.isSpoofingalertPresented = YES;
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"FR Attedance"
+                                                                                     message:@"Spoofing detected Please try again"
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+                // Handle OK action here
+                // NSLog(@"OK button tapped");
+                //  [self performOKAction];
+               
+                if (self.PunchInresultHandler) {
+                    self->_resultDataIN= @{
+                        @"result": @"Spoofing detected",
+                        @"status" : @"punchIn"
+                    };
+                    [self.session stopRunning];
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                    self.PunchInresultHandler(self.resultDataIN);
+                   
+                }
+                if (self.PunchOutresultHandler) {
+                //    if (self.resultDataOUT != nil) {
+                        self->_resultDataOUT= @{
+                            @"result": @"Spoofing detected",
+                            @"status" : @"punchOut"
+                        };
+                  //  }
+                    [self.session stopRunning];
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                    self.PunchOutresultHandler(self.resultDataOUT);
+                   
+                }
+               
+                
+            }];
+               
+            [alertController addAction:okAction];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+            return;
+
+        
+//        NSString *text = [NSString stringWithFormat:@"Recognition times：%d\nPicture Clarity Score：%d", self.time, laplace];
+//        if (laplace > laplacian_threshold) {
+//            text = [text stringByAppendingFormat:@"\nliveness detection score：%f", score];
+//        }
+  //      self.resultLabel.text = text;
+        
+    });
+}
 
 
 - (void)setText:(int)boxesCount score:(float)score {
@@ -447,16 +441,7 @@
                         [self.session stopRunning];
                         [self dismissViewControllerAnimated:YES completion:nil];
                     }
-                    if (self.ForgotPunchOutresultHandler) {
-                        self->_resultDataFORGOTPUNCHOUT= @{
-                            @"result": @"No face Detected",
-                            @"status" : @"forgotPunchOut"
-                        };
-                        self.ForgotPunchOutresultHandler(self.resultDataFORGOTPUNCHOUT);
-                        [self.session stopRunning];
-                        [self dismissViewControllerAnimated:YES completion:nil];
-                    }
-                    //                    [self.delegateForgotPunchOut didReceiveDataForgotPunchOut:@"No face detected"image:nil];
+                 ;
                     
                 }];
                 [alertController addAction:okAction];
@@ -476,11 +461,11 @@
 
 #pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
-       
+    
     //    NSLog(@"isHandling: %d",!self.isHandling);
     //    NSLog(@"typre: %i",self.type);
     NSLog(@"frameNum : %ld",(long)self.frameNum);
-   
+    
     if (self.frameNum > 15 && !self.isHandling) {
         self.isHandling = YES;
         UIImage *image = [self convertSampleBufferToImage:sampleBuffer];
@@ -488,23 +473,20 @@
         CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeFace context:context options:[NSDictionary dictionaryWithObject:CIDetectorAccuracyHigh forKey:CIDetectorAccuracy]];
         CIImage *ciImage = [[CIImage alloc]init];
         ciImage = [CIImage imageWithCGImage:image.CGImage];
-      //  dispatch_async(dispatch_get_main_queue(), ^{
-         //   previewIV.image = resultImage;
-     //   });
+        //  dispatch_async(dispatch_get_main_queue(), ^{
+        //   previewIV.image = resultImage;
+        //   });
         NSArray *results = [detector featuresInImage:ciImage options:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:6] forKey:CIDetectorImageOrientation]];
         for (CIFaceFeature *face in results) {
             UIImage *faceImage = [UIImage imageWithCGImage:[context createCGImage:ciImage fromRect:face.bounds] scale:1.0 orientation:UIImageOrientationRight];
             int size = [results count];
             NSLog(@"there are %d objects in the array", size);
             NSLog(@"111111====%@", face);
-         //   NSLog(@"     ====%@", NSStringFromCGRect(face.bounds));
+            //   NSLog(@"     ====%@", NSStringFromCGRect(face.bounds));
             
-       //     results  @"2 elements"
+            //     results  @"2 elements"
             if (size > 1){
                 dispatch_async(dispatch_get_main_queue(), ^{
-                                        if (!self.isMoreThanOnefaceAlertPresent) {
-                                            self.isMoreThanOnefaceAlertPresent = YES;
-                    
                     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"FR Attedance"
                                                                                              message:@"More than one face detected Please try again"
                                                                                       preferredStyle:UIAlertControllerStyleAlert];
@@ -515,7 +497,6 @@
                         // Handle OK action here
                         // NSLog(@"OK button tapped");
                         //  [self performOKAction]; // Call your custom method here
-                        _isHandling = YES;
                         [self dismissViewControllerAnimated:YES completion:^{
                             if (self.PunchInresultHandler) {
                                 self->_resultDataIN= @{
@@ -525,7 +506,7 @@
                                 [self.session stopRunning];
                                 [self dismissViewControllerAnimated:YES completion:nil];
                                 self.PunchInresultHandler(self.resultDataIN);
-                               
+                                
                             }
                             if (self.PunchOutresultHandler) {
                                 self->_resultDataOUT= @{
@@ -535,24 +516,15 @@
                                 [self.session stopRunning];
                                 [self dismissViewControllerAnimated:YES completion:nil];
                                 self.PunchOutresultHandler(self.resultDataOUT);
+                                
+                            }
                             
-                            }
-                            if (self.ForgotPunchOutresultHandler) {
-                                self->_resultDataFORGOTPUNCHOUT= @{
-                                    @"result": @"More than one face detected",
-                                    @"status" : @"forgotPunchOut"
-                                };
-                                self.ForgotPunchOutresultHandler(self.resultDataFORGOTPUNCHOUT);
-                                [self.session stopRunning];
-                                [self dismissViewControllerAnimated:YES completion:nil];
-                            }
                         }];
                     }];
                     [alertController addAction:okAction];
                     [self presentViewController:alertController animated:YES completion:nil];
-                }
                 });
-            } else if(size == 1){
+            }  else if(size == 1){
                 CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
                 if (pixelBuffer) {
                     CIImage *faceImage = [CIImage imageWithCVImageBuffer:pixelBuffer];
@@ -598,9 +570,8 @@
                 }
                 _isHandling = NO;
             }
-           
         }
-     
+       
     }
     self.frameNum++;
 }
@@ -627,7 +598,7 @@
 -  (void)sendFormDataWithImages:(UIImage *)finalCroppedImage  image2:(UIImage *)regImg {
     {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [_activityIndicator startAnimating];
+            [self->_activityIndicator startAnimating];
         });
         //   NSString *urlString=@"https://frapp1.cgg.gov.in/api/v1/verification/verify";
         //    NSString *urlString=@"https://faceapp.cgg.gov.in/api/v1/verification/verify";
@@ -772,7 +743,7 @@
                         NSString *formattedSimilarity = [numberFormatter stringFromNumber:@(similarityPercentage)];
                         
                         NSLog(@"Similarity: %@%%", formattedSimilarity);
-                        if (similarityPercentage > 85.00){
+                        if (similarityPercentage > 90.00){
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 [self dismissViewControllerAnimated:YES completion:^{
                                     NSLog(@"self.PunchInresultHandler: %@%%", self.PunchInresultHandler);
@@ -801,16 +772,7 @@
                                         [self.session stopRunning];
                                         [self dismissViewControllerAnimated:YES completion:nil];
                                     }
-                                    if (self.ForgotPunchOutresultHandler) {
-                                        self->_resultDataFORGOTPUNCHOUT= @{
-                                            @"result": @"face Matched",
-                                            @"status" : @"forgotPunchOut"
-                                            
-                                        };
-                                        self.ForgotPunchOutresultHandler(self.resultDataFORGOTPUNCHOUT);
-                                        [self.session stopRunning];
-                                        [self dismissViewControllerAnimated:YES completion:nil];
-                                    }
+                                   
                                     // Example: Accessing resultData
                                     NSLog(@"Result Data ios xcode1: %@", self.resultDataIN);
                                     NSLog(@"Result Data ios xcode2: %@", self.resultDataOUT);
@@ -853,16 +815,7 @@
                                         [self.session stopRunning];
                                         [self dismissViewControllerAnimated:YES completion:nil];
                                     }
-                                    if (self.ForgotPunchOutresultHandler) {
-                                        _resultDataFORGOTPUNCHOUT= @{
-                                            @"result": @"face Not Matched",
-                                            @"status" : @"forgotPunchOut"
-                                            
-                                        };
-                                        self.ForgotPunchOutresultHandler(self.resultDataFORGOTPUNCHOUT);
-                                        [self.session stopRunning];
-                                        [self dismissViewControllerAnimated:YES completion:nil];
-                                    }
+                                   
                                     [self dismissViewControllerAnimated:YES completion:^{
                                         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
                                         [userDefaults setObject:@"face not matched" forKey:@"reason"];
