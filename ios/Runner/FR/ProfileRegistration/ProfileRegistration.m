@@ -126,7 +126,12 @@
         [captureButton setImage:[UIImage imageNamed:@"camera"] forState:UIControlStateNormal];
         [captureButton addTarget:self action:@selector(captureButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         // Adjust the frame and other properties as needed
-        captureButton.frame = CGRectMake(CGRectGetWidth(self.view.frame) - 100, CGRectGetHeight(self.view.frame) - 100, 50, 50);
+       
+        CGFloat buttonSize = 100; // Width and height of the button
+                CGFloat xPosition = CGRectGetWidth(self.preview.frame) - buttonSize - 20; // Adjusted x position
+                CGFloat yPosition = CGRectGetHeight(self.preview.frame) - buttonSize - 20; // Adjusted y position
+         
+                captureButton.frame = CGRectMake(xPosition, yPosition, buttonSize, buttonSize);
         [self.preview addSubview:captureButton];
  
     });

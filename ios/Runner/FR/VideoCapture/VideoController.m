@@ -40,6 +40,8 @@
 @property (nonatomic, strong) NSData *profileImageData;
 @property (assign, nonatomic) BOOL isSpoofingAlertPresent;
 @property (assign, nonatomic) BOOL isMoreThanOnefaceAlertPresent;
+@property (assign, nonatomic) BOOL isEyeBlinkalertPresented;
+
 
 
 
@@ -49,6 +51,9 @@
 @implementation VideoController
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if (self) {
+                _booleanList = [NSMutableArray array]; // Initialize the boolean list
+            }
     _type = 1;
     self.isAlertPresented = NO;
     self.isSpoofingAlertPresent = NO;
@@ -547,18 +552,78 @@
                     [self presentViewController:alertController animated:YES completion:nil];
                 }
                 });
-            } else {
-                [self face:image type:self.type];
-                return;
+            } else if(size == 1){
+                CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+                if (pixelBuffer) {
+                    CIImage *faceImage = [CIImage imageWithCVImageBuffer:pixelBuffer];
+                    
+                    // Configure face detection options
+                    NSDictionary *accuracy = @{CIDetectorAccuracy: CIDetectorAccuracyHigh};
+                    CIDetector *faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:accuracy];
+                    
+                    // Detect faces in the image
+                    NSArray<CIFeature *> *faces = [faceDetector featuresInImage:faceImage options:@{CIDetectorSmile: @YES, CIDetectorEyeBlink: @YES}];
+                    for (CIFeature *face in faces) {
+                        
+                        if ([face isKindOfClass:[CIFaceFeature class]]) {
+                            CIFaceFeature *faceFeature = (CIFaceFeature *)face;
+                            
+                            // Determine if both eyes are closed (blinking)
+                            BOOL blinking = faceFeature.leftEyeClosed && faceFeature.rightEyeClosed;
+                            NSLog(@"blinking: %d", blinking);
+                            
+                            [_booleanList addObject:@(blinking)];
+                            
+                            
+                        }
+                        NSLog(@"Boolean value: %@", _booleanList );
+                        BOOL containsZero = [_booleanList containsObject:@(0)];
+                        BOOL containsOne = [_booleanList containsObject:@(1)];
+                        
+                        if (containsZero && containsOne && _movements > 11 && _movements > 0) {
+                            NSLog(@"_booleanList contains both 0 and 1");
+                            _isHandling = YES;
+                            [self face:image type:self.type];
+                            
+                            
+                        } else {
+                            _movements++;
+                            NSLog(@"_booleanList does not contain both 0 and 1");
+                            NSLog(@"Boolean value: %d", _movements );
+                            if (_movements > 100){
+                                [self presentAlertWithEyeBlinkMessage:@"Please make eye moments."];
+                            }
+                        }
+                    }
+                }
+                _isHandling = NO;
             }
            
-
         }
-      [self face:image type:self.type];
+     
     }
     self.frameNum++;
 }
-
+- (void)presentAlertWithEyeBlinkMessage:(NSString *)message {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!self.isEyeBlinkalertPresented) {
+            self.isEyeBlinkalertPresented = YES;
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"MJP PASS"
+                                                                                     message:message
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+                [self.session stopRunning];
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }];
+            [alertController addAction:okAction];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+    });
+  
+}
 -  (void)sendFormDataWithImages:(UIImage *)finalCroppedImage  image2:(UIImage *)regImg {
     {
         dispatch_async(dispatch_get_main_queue(), ^{

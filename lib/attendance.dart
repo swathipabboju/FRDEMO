@@ -167,6 +167,7 @@ class _AttendanceState extends State<Attendance> {
     dynamic result,
     BuildContext context,
   ) async {
+    await _getCurrentLocation();
     String punchResult = '';
     print("Received result from iOS: $result");
 // Assuming result is a Map
@@ -188,40 +189,15 @@ class _AttendanceState extends State<Attendance> {
         setState(() {
           resultvalue = attendancestatus;
         });
-        punchResult = "Punch in Successful";
-      } else if (attendancestatus == "punchOut" && frResult == "face Matched") {
-        setState(() {
-          resultvalue = attendancestatus;
-        });
-        punchResult = "Punch out Successful";
-      } else {
-        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
-      }
-
-      /*   showCupertinoDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CupertinoAlertDialog(
-              title: Text('Attendance'),
-              content: Text('${punchResult}'),
-              actions: [
-                CupertinoDialogAction(
-                  child: Text('OK'),
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(
-                        context, AppRoutes.dashboard); // Close the alert
-                  },
-                ),
-              ],
-            );
-          }); */
-      /* if (attendancestatus == "punchIn" && frResult == "face Matched") {
+        punchRecords.add(PunchRecord('Punch In',
+            DateFormat("hh:mm:ss a").format(DateTime.now()), _currentAddress));
+        _savePunchRecords();
         showCupertinoDialog(
             context: context,
             builder: (BuildContext context) {
               return CupertinoAlertDialog(
                 title: Text('Attendance'),
-                content: Text('Punch In Successfully'),
+                content: Text('Punch in Successful'),
                 actions: [
                   CupertinoDialogAction(
                     child: Text('OK'),
@@ -233,11 +209,35 @@ class _AttendanceState extends State<Attendance> {
                 ],
               );
             });
-        punchRecords.add(PunchRecord('Punch In',
+      } else if (attendancestatus == "punchOut" && frResult == "face Matched") {
+        setState(() {
+          resultvalue = attendancestatus;
+        });
+        punchRecords.add(PunchRecord('Punch Out',
             DateFormat("hh:mm:ss a").format(DateTime.now()), _currentAddress));
+        punchResult = "Punch out Successful";
         _savePunchRecords();
-        //  else if (attendancestatus == "punchOut" && frResult == "face Matched") {
-      } */
+
+        showCupertinoDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CupertinoAlertDialog(
+                title: Text('Attendance'),
+                content: Text('Punch out Successful'),
+                actions: [
+                  CupertinoDialogAction(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(
+                          context, AppRoutes.dashboard); // Close the alert
+                    },
+                  ),
+                ],
+              );
+            });
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+      }
     } else {
       punchResult = '';
     }
@@ -286,14 +286,13 @@ class _AttendanceState extends State<Attendance> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      punchRecords.clear();
       localImage = await getImageFile();
       setState(() {
         print("localImage --------- $localImage");
         Appconstants.sourceFile = localImage ?? File("");
       });
-      if (Appconstants.sourceFile.path.isNotEmpty) {
-        String base64File = await fileToBase64(Appconstants.sourceFile);
-      }
+
       await _getPunchRecords();
       await _checkDayChange();
     });
@@ -323,11 +322,9 @@ class _AttendanceState extends State<Attendance> {
       platformChannelIOS.setMethodCallHandler((call) async {
         switch (call.method) {
           case 'onResultFromPunchIniOS':
-            // print("punch in result");
             _handlePunchResultFromiOS(call.arguments, context);
             break;
           case 'onResultFromPunchOutiOS':
-            // print("punch out result");
             _handlePunchResultFromiOS(call.arguments, context);
             break;
         }

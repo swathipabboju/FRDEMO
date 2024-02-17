@@ -36,7 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^PunchInresultHandler)(NSDictionary *resultDataIN);
 @property (nonatomic, copy) void (^PunchOutresultHandler)(NSDictionary *resultDataOUT);
 @property (nonatomic, copy) void (^ForgotPunchOutresultHandler)(NSDictionary *resultDataFORGOTPUNCHIN);
- 
+
+@property (assign, nonatomic) int movements;
+@property (nonatomic, strong) NSMutableArray<NSNumber *> *booleanList;
  
  
 //@property (nonatomic, weak) id<PunchInDelegate> delegateIn;
