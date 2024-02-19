@@ -12,11 +12,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.Uri;
+
 
 import android.view.Window;
 import android.widget.Button;
@@ -78,53 +74,53 @@ public class Utils {
             e.printStackTrace();
         }
     }
-      public static void customErrorAlert(Activity activity, String title, String msg,boolean flag) {
-          try {
-              final Dialog dialog = new Dialog(activity);
-              dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-              if (dialog.getWindow() != null && dialog.getWindow().getAttributes() != null) {
-                  if (dialog.isShowing()) {
-                      dialog.dismiss();
-                  }
-                  dialog.getWindow().getAttributes().windowAnimations = R.style.exitdialog_animation1;
-                  dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                  dialog.setContentView(R.layout.custom_alert_error);
-                  dialog.setCancelable(false);
-                  // TextView versionTitle = dialog.findViewById(R.id.version_tv);
-                  // versionTitle.setText("Version: " + Utils.getVersionName(activity));
-                  TextView dialogTitle = dialog.findViewById(R.id.dialog_title);
-                  dialogTitle.setText(title);
-                  TextView dialogMessage = dialog.findViewById(R.id.dialog_message);
-                  dialogMessage.setText(msg);
-                  Button btnOK = dialog.findViewById(R.id.btDialogYes);
-                  btnOK.setOnClickListener(v -> {
-                      if (dialog.isShowing()) {
-                          dialog.dismiss();
-                          if(flag)
-                          {
-                              Intent resultIntent = new Intent();
-                              resultIntent.putExtra("resultData", msg);
-                              activity.setResult(
-                                      RESULT_OK
-                                      , resultIntent);
-                              activity.finish();
+    public static void customErrorAlert(Activity activity, String title, String msg,boolean flag) {
+        try {
+            final Dialog dialog = new Dialog(activity);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            if (dialog.getWindow() != null && dialog.getWindow().getAttributes() != null) {
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+                dialog.getWindow().getAttributes().windowAnimations = R.style.exitdialog_animation1;
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.setContentView(R.layout.custom_alert_error);
+                dialog.setCancelable(false);
+                // TextView versionTitle = dialog.findViewById(R.id.version_tv);
+                // versionTitle.setText("Version: " + Utils.getVersionName(activity));
+                TextView dialogTitle = dialog.findViewById(R.id.dialog_title);
+                dialogTitle.setText(title);
+                TextView dialogMessage = dialog.findViewById(R.id.dialog_message);
+                dialogMessage.setText(msg);
+                Button btnOK = dialog.findViewById(R.id.btDialogYes);
+                btnOK.setOnClickListener(v -> {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                        if(flag)
+                        {
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("resultData", msg);
+                            activity.setResult(
+                                    RESULT_OK
+                                    , resultIntent);
+                            activity.finish();
 
 
-                              //activity.onBackPressed();
-                          }
-                      }
+                            //activity.onBackPressed();
+                        }
+                    }
 
 
-                  });
-                  if (!dialog.isShowing())
-                      dialog.show();
-              }
+                });
+                if (!dialog.isShowing())
+                    dialog.show();
+            }
 
 
-          } catch (Resources.NotFoundException e) {
-              e.printStackTrace();
-          }
-      }
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }
