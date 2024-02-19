@@ -76,8 +76,6 @@ import java.nio.ReadOnlyBufferException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -144,12 +142,8 @@ public class LockActivity extends AppCompatActivity {
 
 
         customProgressDialog = new CustomProgressDialog(this);
-        try {
-            fas = new FaceAntiSpoofing(getAssets());
-            mobileFaceNet = new MobileFaceNet(getAssets());
-        } catch (IOException e) {
-            e.fillInStackTrace();
-        }
+        fas = new FaceAntiSpoofing(getAssets());
+        mobileFaceNet = new MobileFaceNet(getAssets());
 
 
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {

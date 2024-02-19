@@ -1,4 +1,4 @@
-package com.example.cgg_attendance;
+package com.example.cgg_attendance
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -21,7 +21,6 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -30,6 +29,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+
 import com.example.cgg_attendance.databinding.ActivityLockBinding
 import com.example.cgg_attendance.facerecog.Api.APIClient
 import com.example.cgg_attendance.facerecog.Api.ApiInterface
@@ -73,8 +73,7 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var detector: FaceDetector? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private var fas: FaceAntiSpoofing? = null
-    //  private var mask: FacMaskDetection? = null
-    private var InOUTVALUE= ""
+    private var InOUTVALUE = ""
     private lateinit var cameraSelector: CameraSelector
     private lateinit var cameraProvider: ProcessCameraProvider
 
@@ -84,8 +83,8 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var loop = 0
     private lateinit var mobileFaceNet: MobileFaceNet
     private lateinit var textToSpeech: TextToSpeech
+    private var movements = 0
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_lock)
@@ -104,12 +103,7 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         InOUTVALUE = intent.getStringExtra("INOUT").toString()
 
-        if (InOUTVALUE != null) {
-            Log.d("Inout", "" + InOUTVALUE)
-            // ...
-        } else {
-            Log.d("Inout", "" + InOUTVALUE)
-        }
+        Log.d("Inout", "" + InOUTVALUE)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         textToSpeech = TextToSpeech(this, this)
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -128,7 +122,8 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
         val highAccuracyOpts = FaceDetectorOptions.Builder()
             .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE).setMinFaceSize(0.15f)
             .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
-            .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL).build()
+            .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
+            .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL).build()
 
         detector = FaceDetection.getClient(highAccuracyOpts)
         cameraBind()
@@ -175,6 +170,7 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun bindPreview(cameraProvider: ProcessCameraProvider) {
         val preview = Preview.Builder().build()
         cameraSelector =
@@ -202,7 +198,7 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
             assert(image != null)
             result = detector!!.process(image!!).addOnSuccessListener { faces: List<Face> ->
-                if (faces.isNotEmpty() && faces.size==1) {
+                if (faces.isNotEmpty() && faces.size == 1) {
 
                     val face = faces[0]
                     if (face.headEulerAngleZ < 7.78f && face.headEulerAngleZ > -7.78f
@@ -217,16 +213,54 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
                         val rot = imageProxy.imageInfo.rotationDegrees
                         val facerotate = rotateBitmap(facebitmap, rot)
                         val boundingBox = RectF(face.boundingBox)
-                        val facecroped: Bitmap = getCropBitmapByCPU1(
+                        val facecroped: Bitmap = getCropBitmapByCPU(
                             facerotate, boundingBox
                         )
+                        //detectFaceMovements(facecroped)
+//                        leftEye = face.getLandmark(FaceLandmark.LEFT_EYE)
+//                         rightEye = face.getLandmark(FaceLandmark.RIGHT_EYE)
+//
+//                        if (leftEye != null && rightEye != null) {
+//                            val leftEyeX: Float = leftEye!!.position.x
+//                            val rightEyeX: Float = rightEye!!.position.y
+//                            val distanceBetweenEyes =
+//                                abs((leftEyeX - rightEyeX).toDouble()).toFloat()
+//                            // You can use this distance to detect various face movements
+//                        //    Log.d("distancebe", "Distance between eyes: $distanceBetweenEyes")
+//                        }
 
-                        val laplacespoof = fas!!.laplacian(facecroped)
-                        Log.e("laplacespooffdgfh:::::$laplacespoof", "0")
-                        if (laplacespoof < FaceAntiSpoofing.LAPLACIAN_THRESHOLD) {
-                            if (laplacespoof == 0) {
-                                Log.e("laplace..0", "0")
-                                binding.tvstatus.text = "spoofing detected"
+                        val leftEye = face.leftEyeOpenProbability
+                        val rightEye = face.rightEyeOpenProbability
+                        Log.e(
+                            "eyeblink",
+                            leftEye.toString() + ":" + rightEye.toString()
+                        )
+                        val threshold = 0.7
+
+                        // Check if both eyes are opened (below the threshold)
+                        val isLeftEyeClosed = leftEye != null && leftEye > threshold
+                        val isRightEyeClosed = rightEye != null && rightEye > threshold
+
+                        // If both eyes are closed, consider it as an eye blink
+                        if (isLeftEyeClosed && isRightEyeClosed && movements < 3 && movements > 0) {
+                            movements++
+                        } else if (!isLeftEyeClosed && !isRightEyeClosed && movements < 1) {
+                            movements = 1
+                            binding.tvstatus.text =
+                                resources.getString(R.string.please_make_some_movements)
+                        } else if (movements == 3) {
+                            binding.tvstatus.text =
+                                resources.getString(R.string.please_place_face_within_the_circle)
+                            Log.e(
+                                "print facesxyz",
+                                ":" + face.headEulerAngleZ + ":" + face.headEulerAngleY + ":" + face.headEulerAngleX
+                            )
+                            val laplacespoof = fas!!.laplacian(facecroped)
+                            Log.e("laplace", laplacespoof.toString())
+                            if (laplacespoof < FaceAntiSpoofing.LAPLACIAN_THRESHOLD) {
+                                if (laplacespoof == 0) {
+                                    Log.e("laplace..0", "0")
+                                    binding.tvstatus.text = resources.getString(R.string.spooing)
 //                                if (textToSpeech.isSpeaking) {
 //                                    Log.e("speeking", "true")
 //                                } else {
@@ -237,96 +271,115 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
 //                                        null
 //                                    )
 //                                }
-                            } else if (laplacespoof < 150) {
+                                } else if (laplacespoof < 150) {
 
-//                                if (textToSpeech.isSpeaking) {
-//                                    Log.e("speaking", "true")
+                                    if (textToSpeech.isSpeaking) {
+                                        Log.e("speaking", "true")
+                                    } else {
+                                        textToSpeech.speak(
+                                            "Please bring mobile closer to the face",
+                                            TextToSpeech.QUEUE_FLUSH,
+                                            null,
+                                            null
+                                        )
+                                    }
+                                } else if (laplacespoof < 200) {
+
+                                    if (textToSpeech.isSpeaking) {
+                                        Log.e("speaking", "true")
+                                    } else {
+                                        textToSpeech.speak(
+                                            "Please clean your camera",
+                                            TextToSpeech.QUEUE_FLUSH,
+                                            null,
+                                            null
+                                        )
+                                    }
+                                } else if (laplacespoof < 250) {
+                                    Log.e("laplace..spoofing", laplacespoof.toString() + "")
+                                    if (textToSpeech.isSpeaking) {
+                                        Log.e("speaking", "true")
+                                    } else {
+                                        textToSpeech.speak(
+                                            "you are in light environment",
+                                            TextToSpeech.QUEUE_FLUSH,
+                                            null,
+                                            null
+                                        )
+                                    }
+                                }
+                                spoof(laplacespoof, facecroped, "0", "Face lighting issue")
+                            } else {
+//                                val label = predict(facecroped)
+//                                val with = label["WithMask"] ?: 0F
+//                                val without = label["WithoutMask"] ?: 0F
+//                                if (with > without) {
+//                                    binding.tvstatus.text =
+//                                        resources.getString(R.string.please_remove_mask)
+//                                    if (textToSpeech.isSpeaking) {
+//                                        Log.e("speaking", "true")
+//                                    } else {
+//                                        textToSpeech.speak(
+//                                            "Please remove mask",
+//                                            TextToSpeech.QUEUE_FLUSH,
+//                                            null,
+//                                            null
+//                                        )
+//                                    }
 //                                } else {
-//                                    textToSpeech.speak(
-//                                        "Please bring mobile closer to the face",
-//                                        TextToSpeech.QUEUE_FLUSH,
-//                                        null,
-//                                        null
-//                                    )
-//                                }
-                            }else if (laplacespoof < 200) {
-
-//                                if (textToSpeech.isSpeaking) {
-//                                    Log.e("speaking", "true")
-//                                } else {
-//                                    textToSpeech.speak(
-//                                        "Please clean your camera",
-//                                        TextToSpeech.QUEUE_FLUSH,
-//                                        null,
-//                                        null
-//                                    )
-//                                }
-                            } else if (laplacespoof < 250) {
-                                Log.e("laplace..spoofing", laplacespoof.toString() + "")
-//                                if (textToSpeech.isSpeaking) {
-//                                    Log.e("speaking", "true")
-//                                } else {
-//                                    textToSpeech.speak(
-//                                        "you are in light environment",
-//                                        TextToSpeech.QUEUE_FLUSH,
-//                                        null,
-//                                        null
-//                                    )
-//                                }
-
-
-                            }
-
-                            spoof(laplacespoof, facecroped, "0", "Face lighting issue")
-                        } else {
-                            textToSpeech.stop()
-                            val score1 = fas!!.antiSpoofing(facecroped)
-                            Log.e("threshold", score1.toString() + "")
-                            if (score1 < FaceAntiSpoofing.THRESHOLD) {
-                                binding.tvstatus.text = resources.getString(R.string.recognising)
-                                runOnUiThread {
-                                    Log.e("thresholdscore1", score1.toString() + "")
-                                    binding.tvstatus.setText(R.string.recognising)
-                                    if (loop == 0) {
-                                        loop++
-                                        binding.progressBar.progress = 50
-                                    } else if (loop == 1) {
-                                        binding.tvstatus.text = "Recognising..."
-//                                        if (textToSpeech.isSpeaking) {
-//                                            Log.e("speeking", "true")
-//                                        } else {
-//                                            textToSpeech.speak(
-//                                                "Recognising",
-//                                                TextToSpeech.QUEUE_FLUSH,
-//                                                null,
-//                                                null
-//                                            )
-//                                        }
-                                        binding.progressBar.progress = 100
-                                        cameraProvider.unbindAll()
-                                        customProgressDialog.show()
-                                        val profile =
-                                            File(getExternalFilesDir(null), "profile.jpg")
-//                                        val profile2 =
-//                                            File(getExternalFilesDir(null), "profile.jpg")
-                                        val profile2 =
-                                            File(getExternalFilesDir(null), "profile.jpg")
-                                        if(profile.exists()&&profile2.exists()) {
+                                textToSpeech.stop()
+                                val score1 = fas!!.antiSpoofing(facecroped)
+                                Log.e("threshold", score1.toString() + "")
+                                if (score1 < FaceAntiSpoofing.THRESHOLD) {
+                                    binding.tvstatus.text =
+                                        resources.getString(R.string.recognising)
+                                    runOnUiThread {
+                                        Log.e("threshold", score1.toString() + "")
+                                        binding.tvstatus.setText(R.string.recognising)
+                                        if (loop == 0) {
+                                            loop++
+                                            binding.progressBar.progress = 50
+                                        } else if (loop == 1) {
+                                            if (textToSpeech.isSpeaking) {
+                                                Log.e("speaking", "true")
+                                            } else {
+                                                textToSpeech.speak(
+                                                    "Recognising",
+                                                    TextToSpeech.QUEUE_FLUSH,
+                                                    null,
+                                                    null
+                                                )
+                                            }
+                                            binding.progressBar.progress = 100
+                                            cameraProvider.unbindAll()
+                                            customProgressDialog.show()
+                                            val profile =
+                                                File(getExternalFilesDir(null), "profile.jpg")
                                             val profilebitmap =
                                                 BitmapFactory.decodeFile(profile.toString())
                                             val width1 = profilebitmap.getWidth()
                                             if (width1 > 0) {
                                                 val same: Float =
-                                                    mobileFaceNet.compare(profilebitmap, facecroped)
+                                                    mobileFaceNet.compare(
+                                                        profilebitmap,
+                                                        facecroped
+                                                    )
                                                 if (same > MobileFaceNet.THRESHOLD) {
-                                                    Log.e("threshold offline", same.toString() + "")
-                                                    facematch(laplacespoof, same)
-                                                    Toast.makeText(this, "local::$same", Toast.LENGTH_LONG)
-                                                        .show()
-
+                                                    Log.e(
+                                                        "threshold offline",
+                                                        same.toString() + ""
+                                                    )
+                                                    facematch(
+                                                        laplacespoof,
+                                                        String.format("%.2f", same)
+                                                                + " offline"
+                                                    )
                                                 } else {
                                                     val filename =
-                                                        File(getExternalFilesDir(null), "image.jpg")
+                                                        File(
+                                                            getExternalFilesDir(null),
+                                                            "image.jpg"
+                                                        )
                                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                                         try {
                                                             Files.newOutputStream(filename.toPath())
@@ -344,9 +397,10 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
                                                         }
                                                     } else {
                                                         try {
-                                                            val outputStream = BufferedOutputStream(
-                                                                FileOutputStream(filename)
-                                                            )
+                                                            val outputStream =
+                                                                BufferedOutputStream(
+                                                                    FileOutputStream(filename)
+                                                                )
                                                             facecroped.compress(
                                                                 Bitmap.CompressFormat.JPEG,
                                                                 100,
@@ -361,7 +415,7 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
 
 
                                                     val filelive = File(filename.absolutePath)
-                                                    val fileprofile = File(profile2.absolutePath)
+                                                    val fileprofile = File(profile.absolutePath)
 
 
                                                     val requestFile =
@@ -398,20 +452,17 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
                                                         ) {
                                                             if (response.body() != null && response.code() == 200 && response.isSuccessful) {
                                                                 customProgressDialog.dismiss()
-                                                                val imageResponse = response.body()
+                                                                val imageResponse =
+                                                                    response.body()
                                                                 if (imageResponse!!.result != null) {
-                                                                    if (imageResponse.result[0].face_matches[0].similarity > 0.96) {
+                                                                    if (imageResponse.result[0].face_matches[0].similarity > 0.92) {
                                                                         facematch(
                                                                             laplacespoof,
-                                                                            imageResponse.result[0].face_matches[0].similarity.toFloat()
-
+                                                                            String.format(
+                                                                                "%.2f",
+                                                                                imageResponse.result[0].face_matches[0].similarity.toFloat()
+                                                                            ) + "online"
                                                                         )
-                                                                        Toast.makeText(
-                                                                            this@FaceRecognition,
-                                                                            "online :::$same",
-
-                                                                            Toast.LENGTH_LONG
-                                                                        ).show()
                                                                     } else {
                                                                         spoof(
                                                                             laplacespoof,
@@ -445,7 +496,8 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
                                                                     )
                                                                 }
                                                             } else {
-                                                                val gson = GsonBuilder().create()
+                                                                val gson =
+                                                                    GsonBuilder().create()
                                                                 var pojo = LoginErrorResponse()
                                                                 try {
                                                                     pojo = gson.fromJson(
@@ -454,13 +506,15 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
                                                                         LoginErrorResponse::class.java
                                                                     )
                                                                 } catch (e: IOException) {
-                                                                    e.printStackTrace()
+                                                                    e.fillInStackTrace()
                                                                 }
                                                                 Utils.customErrorAlertcamera(
                                                                     this@FaceRecognition,
                                                                     getString(R.string.app_name),
                                                                     pojo.message!!,
-                                                                    true, profilebitmap, facecroped
+                                                                    true,
+                                                                    profilebitmap,
+                                                                    facecroped
                                                                 )
                                                                 spoof(
                                                                     laplacespoof,
@@ -472,7 +526,8 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
                                                         }
 
                                                         override fun onFailure(
-                                                            call: Call<ImageResponse?>, t: Throwable
+                                                            call: Call<ImageResponse?>,
+                                                            t: Throwable
                                                         ) {
                                                             Log.e("Error", t.message!!)
                                                             customProgressDialog.dismiss()
@@ -488,35 +543,30 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
                                                 }
                                             }
                                         }
-                                        else{
-                                            Utils.customErrorAlert(
-                                                this@FaceRecognition,
-                                                getString(R.string.app_name),
-                                                "profile image not exist",
-                                                true
-                                            )
-                                        }
                                     }
-                                }
 
+                                } else {
+                                    binding.tvstatus.text =
+                                        resources.getString(R.string.spooing)
+                                }
+                                //}
                             }
+                        } else {
+                            binding.tvstatus.text =
+                                resources.getString(R.string.please_make_some_movements)
                         }
 
-
                     } else {
+                        binding.tvstatus.text =
+                            resources.getString(R.string.please_place_face_within_the_circle)
                         Log.e(
                             "print facesxyz",
                             ":" + face.headEulerAngleZ + ":" + face.headEulerAngleY + ":" + face.headEulerAngleX
                         )
-
-                        binding.tvstatus.text =
-                            resources.getString(R.string.please_place_face_within_the_circle)
                     }
-                }
-                else if(faces.size>1){
-                    binding.tvstatus.text = resources.getString(R.string.more_than)
-                }
-                else {
+                } else if (faces.size > 1) {
+                    binding.tvstatus.text = resources.getString(R.string.more_than_one_face)
+                } else {
                     binding.tvstatus.text = resources.getString(R.string.no_face_detected)
 
                 }
@@ -526,7 +576,7 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
 
-    private fun facematch(laplace: Int, same: Float) {
+    private fun facematch(laplace: Int, same: String) {
         customProgressDialog.dismiss()
 
         val resultIntent = Intent()
@@ -543,29 +593,16 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun spoof(laplace1: Int, facecroped: Bitmap, matchpercentage: String, reason: String) {
 
         val filename = File(getExternalFilesDir(null), "image.jpg")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            try {
-                Files.newOutputStream(filename.toPath()).use { outputStream ->
-                    facecroped.compress(
-                        Bitmap.CompressFormat.JPEG, 100, outputStream
-                    )
-                    outputStream.flush()
-                    outputStream.close()
-                }
-            } catch (e: IOException) {
-                e.fillInStackTrace()
-            }
-        } else {
-            try {
-                val outputStream = BufferedOutputStream(FileOutputStream(filename))
+        try {
+            Files.newOutputStream(filename.toPath()).use { outputStream ->
                 facecroped.compress(
                     Bitmap.CompressFormat.JPEG, 100, outputStream
                 )
                 outputStream.flush()
                 outputStream.close()
-            } catch (e: IOException) {
-                e.fillInStackTrace()
             }
+        } catch (e: IOException) {
+            e.fillInStackTrace()
         }
 
     }
@@ -659,63 +696,24 @@ class FaceRecognition : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
 
-//    private fun getCropBitmapByCPU(source: Bitmap, cropRectF: RectF): Bitmap {
-//        val resultBitmap = Bitmap.createBitmap(
-//            cropRectF.width().toInt(), cropRectF.height().toInt(), Bitmap.Config.ARGB_8888
-//        )
-//        val cavas = Canvas(resultBitmap)
-//        val paint = Paint(Paint.FILTER_BITMAP_FLAG)
-//        paint.setColor(Color.WHITE)
-//        cavas.drawRect(RectF(0f, 0f, cropRectF.width(), cropRectF.height()), paint)
-//        val matrix = Matrix()
-//        matrix.postTranslate(-cropRectF.left, -cropRectF.top)
-//        cavas.drawBitmap(source, matrix, paint)
-//        if (!source.isRecycled) {
-//            source.recycle()
-//        }
-//        return resultBitmap
-//    }
-private fun getCropBitmapByCPU1(source: Bitmap, originalFaceRect: RectF): Bitmap {
-    // Increase the size of the bounding box (adjust the values as needed)
-    val scaleFactor = 1.5f // Increase by 50%, you can adjust this value
-    val newWidth = originalFaceRect.width() * scaleFactor
-    val newHeight = originalFaceRect.height() * scaleFactor
-
-    // Calculate the new coordinates for the top-left corner of the bounding box
-    var newLeft = originalFaceRect.left - (newWidth - originalFaceRect.width()) / 2
-    var newTop = originalFaceRect.top - (newHeight - originalFaceRect.height()) / 2
-
-    // Ensure the new coordinates are within the bounds of the image
-    newLeft = max(0.0, newLeft.toDouble()).toFloat()
-    newTop = max(0.0, newTop.toDouble()).toFloat()
-    val newRight =
-        min(source.getWidth().toDouble(), (newLeft + newWidth).toDouble()).toFloat()
-    val newBottom =
-        min(source.getHeight().toDouble(), (newTop + newHeight).toDouble()).toFloat()
-
-    // Create the new RectF with the adjusted coordinates
-    val newFaceRect = RectF(newLeft, newTop, newRight, newBottom)
-
-    // Create the result bitmap with the adjusted bounding box
-    val resultBitmap = Bitmap.createBitmap(
-        newFaceRect.width().toInt(),
-        newFaceRect.height().toInt(),
-        Bitmap.Config.ARGB_8888
-    )
-    val canvas = Canvas(resultBitmap)
-    val paint = Paint(Paint.FILTER_BITMAP_FLAG)
-    paint.setColor(Color.WHITE)
-    canvas.drawRect(RectF(0f, 0f, newFaceRect.width(), newFaceRect.height()), paint)
-    val matrix = Matrix()
-    matrix.postTranslate(-newFaceRect.left, -newFaceRect.top)
-    canvas.drawBitmap(source, matrix, paint)
-
-    // Recycle the original bitmap if it's not null and not recycled
-    if (!source.isRecycled) {
-        source.recycle()
+        private fun getCropBitmapByCPU(source: Bitmap, cropRectF: RectF): Bitmap {
+        val resultBitmap = Bitmap.createBitmap(
+            cropRectF.width().toInt(), cropRectF.height().toInt(), Bitmap.Config.ARGB_8888
+        )
+        val cavas = Canvas(resultBitmap)
+        val paint = Paint(Paint.FILTER_BITMAP_FLAG)
+        paint.setColor(Color.WHITE)
+        cavas.drawRect(RectF(0f, 0f, cropRectF.width(), cropRectF.height()), paint)
+        val matrix = Matrix()
+        matrix.postTranslate(-cropRectF.left, -cropRectF.top)
+        cavas.drawBitmap(source, matrix, paint)
+        if (!source.isRecycled) {
+            source.recycle()
+        }
+        return resultBitmap
     }
-    return resultBitmap
-}
+
+
     private fun yuv(image: Image?): ByteArray {
         val width = image!!.width
         val height = image.height
